@@ -141,6 +141,7 @@
     "sending": "Sending…",
     "required": "Required field",
     "errorGeneric": "Something went wrong. Please try again in a moment.",
+    "tooFast": "One moment… then try sending again.",
     "all": "All",
     "whatsapp": "Share on WhatsApp"
   },

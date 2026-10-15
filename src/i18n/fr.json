@@ -141,6 +141,7 @@
     "sending": "Envoi…",
     "required": "Champ obligatoire",
     "errorGeneric": "Une erreur est survenue. Réessayez dans un instant.",
+    "tooFast": "Un instant… puis réessayez d’envoyer.",
     "all": "Tous",
     "whatsapp": "Partager sur WhatsApp"
   },

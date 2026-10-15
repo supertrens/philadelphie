@@ -4,7 +4,7 @@ import { useActionState, useEffect, useRef } from "react";
 import { fieldClass, Honeypot, Label, SubmitButton, ThankYou } from "@/components/public-form";
 import { sendPrayerRequest } from "./actions";
 
-type T = (typeof import("@/i18n/fr.json"))["prayer"] & { sending: string; errorGeneric: string; required: string };
+type T = (typeof import("@/i18n/fr.json"))["prayer"] & { sending: string; errorGeneric: string; required: string; tooFast: string };
 
 export function PrayerForm({ t }: { t: T }) {
   const [state, action, pending] = useActionState(sendPrayerRequest, null);
@@ -23,7 +23,7 @@ export function PrayerForm({ t }: { t: T }) {
       <div>
         <Label htmlFor="p-message">{t.message} *</Label>
         <textarea id="p-message" name="message" required minLength={5} maxLength={4000} rows={6} className={fieldClass} />
-        {state && !state.ok && <p className="mt-2 text-sm text-red-700">{state.error === "message" ? t.required : t.errorGeneric}</p>}
+        {state && !state.ok && <p className="mt-2 text-sm text-red-700">{state.error === "message" ? t.required : state.error === "tooFast" ? t.tooFast : t.errorGeneric}</p>}
       </div>
       <label className="flex items-start gap-3 rounded-2xl bg-subtle p-4 text-sm text-ink">
         <input type="checkbox" name="confidential" className="mt-0.5 h-4 w-4 accent-accent" /> {t.confidential}

@@ -4,7 +4,7 @@ import { useActionState, useEffect, useRef } from "react";
 import { fieldClass, Honeypot, Label, SubmitButton, ThankYou } from "@/components/public-form";
 import { sendContactMessage } from "./actions";
 
-type T = (typeof import("@/i18n/fr.json"))["contactPage"] & { sending: string; errorGeneric: string };
+type T = (typeof import("@/i18n/fr.json"))["contactPage"] & { sending: string; errorGeneric: string; tooFast: string };
 
 export function ContactForm({ t }: { t: T }) {
   const [state, action, pending] = useActionState(sendContactMessage, null);
@@ -31,7 +31,7 @@ export function ContactForm({ t }: { t: T }) {
       <div>
         <Label htmlFor="c-message">{t.message} *</Label>
         <textarea id="c-message" name="message" required minLength={5} maxLength={4000} rows={6} className={fieldClass} />
-        {state && !state.ok && <p className="mt-2 text-sm text-red-700">{t.errorGeneric}</p>}
+        {state && !state.ok && <p className="mt-2 text-sm text-red-700">{state.error === "tooFast" ? t.tooFast : t.errorGeneric}</p>}
       </div>
       <div className="flex justify-end"><SubmitButton label={t.submit} sending={t.sending} /></div>
     </form>

@@ -35,12 +35,14 @@ export function Screen({ initial, title, dateLabel }: { initial: LiveScreenData;
     dataRef.current = data;
   }, [data]);
 
-  // Rafraîchissement des données toutes les 5 s
+  // Rafraîchissement des données toutes les 5 s (le jeton kiosque `?k=` de l'URL est transmis à l'API)
   useEffect(() => {
     let active = true;
+    const k = new URLSearchParams(window.location.search).get("k");
+    const api = k === null ? "/api/comptage" : `/api/comptage?k=${encodeURIComponent(k)}`;
     const tick = async () => {
       try {
-        const res = await fetch("/api/comptage", { cache: "no-store" });
+        const res = await fetch(api, { cache: "no-store" });
         if (!res.ok) throw new Error(String(res.status));
         const fresh = (await res.json()) as LiveScreenData;
         if (active) {

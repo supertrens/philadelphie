@@ -1,13 +1,21 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { DEFAULT_LOCALE, LOCALES, pickLocale } from "@/i18n/locales";
+import { isValidScreenToken } from "@/lib/screen-token";
 
 // Espace membres : réservé aux utilisateurs connectés (sauf la page de connexion)
 const isStaff = createRouteMatcher(["/espace(.*)", "/api/upload(.*)"]);
 const isSignIn = createRouteMatcher(["/espace/connexion(.*)"]);
 const isApi = createRouteMatcher(["/api(.*)"]);
+// Écran TV en mode kiosque : /espace/comptage/ecran?k=<SCREEN_TOKEN> passe sans session
+const isScreen = createRouteMatcher(["/espace/comptage/ecran"]);
 
 export default clerkMiddleware(async (auth, req) => {
+  if (isScreen(req) && req.nextUrl.searchParams.has("k")) {
+    // Bon jeton : la page vérifie encore ; mauvais jeton : 401, jamais la page de connexion
+    if (isValidScreenToken(req.nextUrl.searchParams.get("k"))) return;
+    return new NextResponse("Non autorisé", { status: 401 });
+  }
   if (isStaff(req)) {
     if (!isSignIn(req)) await auth.protect();
     return;

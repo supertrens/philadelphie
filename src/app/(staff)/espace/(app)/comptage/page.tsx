@@ -1,10 +1,13 @@
 import { Tv } from "lucide-react";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Suspense } from "react";
+import { CopyButton } from "@/components/copy-button";
 import { Button, Card, Empty, PageHeader } from "@/components/ui";
 import { requireStaff } from "@/lib/auth";
 import { getAttendanceHistory, getClosedAttendance, getScreenData } from "@/lib/comptage";
 import { formatSabbath, sabbathDate } from "@/lib/sabbath";
+import { screenToken } from "@/lib/screen-token";
 import { closeDay } from "./actions";
 import { Counter } from "./counter";
 
@@ -36,12 +39,16 @@ async function Content() {
 
       <Counter initial={data} />
 
+      <Suspense fallback={null}>
+        <ScreenLinkCard />
+      </Suspense>
+
       <Card title="Clôturer le comptage">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <p className="max-w-xl text-sm text-muted">
             {closed
               ? `Ce Sabbat a été clôturé par ${closed.closedBy ?? "—"} avec ${closed.total} personne${closed.total > 1 ? "s" : ""}. Clôturer à nouveau remplace ces totaux par ceux affichés ci-dessus.`
-              : "À la fin du culte, enregistrez les totaux dans l'historique des présences. Vous pourrez encore corriger et clôturer à nouveau."}
+              : "À la fin du culte, enregistrez les totaux dans l'historique des présences. Vous pourrez encore corriger et clôturer à nouveau. Sans clôture manuelle, les totaux sont enregistrés automatiquement le samedi soir."}
           </p>
           <form action={closeDay}><Button type="submit">{closed ? "Clôturer à nouveau" : "Clôturer"}</Button></form>
         </div>
@@ -68,5 +75,27 @@ async function Content() {
         )}
       </Card>
     </div>
+  );
+}
+
+/** Lien de l'écran TV sans connexion (mode kiosque), affiché seulement si SCREEN_TOKEN est défini. */
+async function ScreenLinkCard() {
+  const token = screenToken();
+  if (!token) return null;
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "";
+  const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
+  const url = `${proto}://${host}/espace/comptage/ecran?k=${encodeURIComponent(token)}`;
+  return (
+    <Card title="Écran TV sans connexion">
+      <p className="text-sm text-muted">
+        Ouvrez ce lien dans le navigateur de la télévision : l&apos;écran s&apos;affiche sans mot de passe et se met à jour tout seul.
+        Il donne accès aux chiffres et aux noms affichés, ne le partagez qu&apos;avec la personne qui installe la TV.
+      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <input readOnly value={url} aria-label="Lien de l'écran TV" className="min-w-0 flex-1 rounded-lg border border-line bg-subtle px-3 py-2 font-mono text-xs text-ink" />
+        <CopyButton text={url} />
+      </div>
+    </Card>
   );
 }

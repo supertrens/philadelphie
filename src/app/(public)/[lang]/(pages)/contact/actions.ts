@@ -2,6 +2,7 @@
 
 import { eglise } from "@/config/eglise";
 import { contactMessages, db } from "@/db";
+import { isEmptySubmission, spamCheck } from "@/lib/anti-spam";
 import { emailLayout, sendEmail } from "@/lib/email";
 import type { FormState } from "@/components/public-form";
 
@@ -9,7 +10,12 @@ const text = (f: FormData, k: string, max = 4000) => String(f.get(k) ?? "").trim
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
 export async function sendContactMessage(_prev: FormState, formData: FormData): Promise<FormState> {
-  if (text(formData, "site_web")) return { ok: true };
+  // Réinitialisation du formulaire (« Envoyer un autre message ») : pas d'envoi
+  if (isEmptySubmission(formData)) return null;
+  // Anti-spam : robot (champ piège rempli) → on fait comme si tout s'était bien passé ; trop rapide → refus
+  const spam = spamCheck(formData);
+  if (spam === "bot") return { ok: true };
+  if (spam === "fast") return { ok: false, error: "tooFast" };
   const name = text(formData, "name", 120);
   const email = text(formData, "email", 200);
   const subject = text(formData, "subject", 160);

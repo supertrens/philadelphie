@@ -2,6 +2,7 @@
 
 import { eglise } from "@/config/eglise";
 import { db, prayerRequests } from "@/db";
+import { isEmptySubmission, spamCheck } from "@/lib/anti-spam";
 import { emailLayout, sendEmail } from "@/lib/email";
 import type { FormState } from "@/components/public-form";
 
@@ -9,8 +10,12 @@ const text = (f: FormData, k: string, max = 4000) => String(f.get(k) ?? "").trim
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
 export async function sendPrayerRequest(_prev: FormState, formData: FormData): Promise<FormState> {
-  // Piège à robots : on fait comme si tout s'était bien passé
-  if (text(formData, "site_web")) return { ok: true };
+  // Réinitialisation du formulaire (« Envoyer un autre message ») : pas d'envoi
+  if (isEmptySubmission(formData)) return null;
+  // Anti-spam : robot (champ piège rempli) → on fait comme si tout s'était bien passé ; trop rapide → refus
+  const spam = spamCheck(formData);
+  if (spam === "bot") return { ok: true };
+  if (spam === "fast") return { ok: false, error: "tooFast" };
   const message = text(formData, "message");
   if (message.length < 5) return { ok: false, error: "message" };
   const name = text(formData, "name", 120) || null;

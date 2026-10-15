@@ -42,7 +42,7 @@ export default async function PrayerPage({ params }: { params: Params }) {
             </div>
           </Reveal>
           <Reveal delay={100}>
-            <PrayerForm t={{ ...t.prayer, sending: t.common.sending, errorGeneric: t.common.errorGeneric, required: t.common.required }} />
+            <PrayerForm t={{ ...t.prayer, sending: t.common.sending, errorGeneric: t.common.errorGeneric, required: t.common.required, tooFast: t.common.tooFast }} />
           </Reveal>
         </div>
       </section>

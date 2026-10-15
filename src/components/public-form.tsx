@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckCircle2, Loader2 } from "lucide-react";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 
 export type FormState = { ok: boolean; error?: string } | null;
@@ -13,12 +13,24 @@ export function Label({ children, htmlFor }: { children: ReactNode; htmlFor: str
   return <label htmlFor={htmlFor} className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">{children}</label>;
 }
 
-/** Champ piège invisible pour les robots : s'il est rempli, l'envoi est ignoré. */
+/**
+ * Anti-spam sans CAPTCHA (vérifié côté serveur par `spamCheck`) :
+ * - champ piège `website`, invisible : s'il est rempli, l'envoi est ignoré en silence ;
+ * - horodatage `ts` posé au montage : un envoi moins de 3 s après l'affichage est refusé.
+ */
 export function Honeypot() {
+  const ts = useRef<HTMLInputElement>(null);
+  // Posé après le montage (et non au rendu) pour que le HTML serveur et le client restent identiques
+  useEffect(() => {
+    if (ts.current) ts.current.value = String(Date.now());
+  }, []);
   return (
-    <div className="absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden" aria-hidden="true">
-      <label>Site web<input type="text" name="site_web" tabIndex={-1} autoComplete="off" /></label>
-    </div>
+    <>
+      <div className="absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden" aria-hidden="true">
+        <label>Site web<input type="text" name="website" tabIndex={-1} autoComplete="off" /></label>
+      </div>
+      <input ref={ts} type="hidden" name="ts" defaultValue="" />
+    </>
   );
 }
 

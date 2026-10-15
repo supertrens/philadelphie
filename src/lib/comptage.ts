@@ -2,7 +2,7 @@ import "server-only";
 import { asc, desc, eq, sql } from "drizzle-orm";
 import { attendanceLive, db, sabbathVisitors, servicesAttendance } from "@/db";
 import { getBirthdaysOfWeek } from "./birthdays";
-import { CATEGORIES, type Category, type LiveCounts, type LiveScreenData, type Visitor, sabbathDate } from "./sabbath";
+import { addDays, CATEGORIES, type Category, type LiveCounts, type LiveScreenData, type Visitor, sabbathDate, todayDate } from "./sabbath";
 
 /** Compteurs en direct du Sabbat (lecture directe, jamais mise en cache). */
 export async function getLiveCounts(date = sabbathDate()): Promise<LiveCounts> {
@@ -57,4 +57,27 @@ export async function incrementLive(category: Category, delta: number, date = sa
       target: [attendanceLive.date, attendanceLive.category],
       set: { count: sql`GREATEST(${attendanceLive.count} + ${delta}, 0)`, updatedAt: new Date() },
     });
+}
+
+/** Sabbat le plus récent : aujourd'hui si l'on est samedi (heure d'Indianapolis), sinon le samedi passé. */
+export function lastSabbathDate(now = new Date()) {
+  const sabbath = sabbathDate(now);
+  return sabbath === todayDate(now) ? sabbath : addDays(sabbath, -7);
+}
+
+/**
+ * Clôture : copie les totaux en direct d'un Sabbat dans l'historique (`services_attendance`).
+ * - `replace` (clôture manuelle) : remplace une clôture précédente du même Sabbat.
+ * - `keep` (clôture automatique) : ne touche pas à une clôture déjà faite.
+ * Renvoie les compteurs et si une ligne a été écrite.
+ */
+export async function closeSabbath(date: string, closedBy: string, mode: "replace" | "keep"): Promise<{ counts: LiveCounts; closed: boolean }> {
+  const counts = await getLiveCounts(date);
+  const values = { adultes: counts.adultes, enfants: counts.enfants, visiteurs: counts.visiteurs, total: counts.total, closedBy, closedAt: new Date() };
+  const insert = db.insert(servicesAttendance).values({ date, ...values });
+  const rows =
+    mode === "replace"
+      ? await insert.onConflictDoUpdate({ target: servicesAttendance.date, set: values }).returning({ id: servicesAttendance.id })
+      : await insert.onConflictDoNothing().returning({ id: servicesAttendance.id });
+  return { counts, closed: rows.length > 0 };
 }

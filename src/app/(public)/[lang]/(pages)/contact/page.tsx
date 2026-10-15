@@ -63,7 +63,7 @@ export default async function ContactPage({ params }: { params: Params }) {
             </div>
           </Reveal>
           <Reveal delay={100}>
-            <ContactForm t={{ ...t.contactPage, sending: t.common.sending, errorGeneric: t.common.errorGeneric }} />
+            <ContactForm t={{ ...t.contactPage, sending: t.common.sending, errorGeneric: t.common.errorGeneric, tooFast: t.common.tooFast }} />
           </Reveal>
         </div>
       </section>

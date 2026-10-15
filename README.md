@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Église Adventiste Philadelphie — site et espace membres
 
-## Getting Started
+Next.js 16 (cacheComponents), Tailwind v4, Neon Postgres + Drizzle, Clerk, Vercel Blob, Resend (optionnel).
+Déploiement : chaque push sur `main` est déployé par Vercel.
 
-First, run the development server:
+## Démarrer
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+vercel env pull        # DATABASE_URL, Clerk, Blob…
+npm run dev            # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Les variables attendues sont listées et commentées dans `.env.example`.
+Schéma de base : `src/db/schema.ts`, appliqué avec `npx drizzle-kit push`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Comptage du Sabbat
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/espace/comptage` : compteurs en direct (adultes, enfants, visiteurs), clôture manuelle, historique.
+- `/espace/comptage/ecran` : écran plein format pour la télévision. Avec `SCREEN_TOKEN` défini,
+  `/espace/comptage/ecran?k=<jeton>` s'ouvre sans compte (mode kiosque) ; la page Comptage affiche ce lien à copier.
+- Clôture automatique : `vercel.json` déclenche `GET /api/cron/cloture` (protégé par `CRON_SECRET`) avec le cron
+  `55 3 * * 0`. Vercel interprète les crons en **UTC** : dimanche 03:55 UTC = **samedi 23:55 à Indianapolis à l'heure
+  d'été (EDT, UTC−4)** et samedi 22:55 à l'heure d'hiver (EST, UTC−5). La route clôture le Sabbat le plus récent
+  (samedi en cours ou passé, heure d'Indianapolis), uniquement si des compteurs existent et qu'aucune clôture n'a été
+  faite : une clôture manuelle n'est jamais écrasée. Sur l'offre Hobby, Vercel peut exécuter le cron avec jusqu'à une
+  heure de retard ; la route gère ce cas (elle vise encore le samedi écoulé).
 
-## Learn More
+## Formulaires publics (contact, prière)
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Anti-spam sans CAPTCHA : champ pot de miel caché (`website`) ignoré silencieusement s'il est rempli, et refus si
+l'envoi arrive moins de 3 secondes après l'affichage du formulaire (`src/lib/anti-spam.ts`).
