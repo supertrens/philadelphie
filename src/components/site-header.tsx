@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { eglise } from "@/config/eglise";
 import type { Locale } from "@/i18n/locales";
 import { LiveBadge } from "./live-badge";
@@ -124,8 +125,10 @@ export function SiteHeader({ lang, nav, sousTitre, live = false }: { lang: Local
           </button>
         </div>
       </nav>
-      {open && (
-        <div id="menu-mobile" role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex flex-col bg-bg text-night xl:hidden">
+      {/* Menu monté sur <body> (portail) : dans l'en-tête, le flou (backdrop-filter) devient le bloc conteneur
+          du « fixed » sur Safari et le menu se retrouve sans fond. */}
+      {open && typeof document !== "undefined" && createPortal(
+        <div id="menu-mobile" role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex flex-col overflow-y-auto overscroll-contain bg-bg text-night xl:hidden">
           <div className="h-1 bg-gradient-to-r from-gold via-gold-strong to-gold" />
           <div className="flex items-center justify-between px-5 py-5 sm:px-8">
             <Brand lang={lang} sousTitre={sousTitre} onClick={close} />
@@ -136,7 +139,8 @@ export function SiteHeader({ lang, nav, sousTitre, live = false }: { lang: Local
           <Suspense fallback={<NavLinks lang={lang} nav={nav} live={live} mobile onNavigate={close} pathname={null} />}>
             <NavLinksLive lang={lang} nav={nav} live={live} mobile onNavigate={close} />
           </Suspense>
-        </div>
+        </div>,
+        document.body,
       )}
     </header>
   );
