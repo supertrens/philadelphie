@@ -3,6 +3,7 @@
 import { eq } from "drizzle-orm";
 import { revalidatePath, updateTag } from "next/cache";
 import { attendance, db, events, members } from "@/db";
+import { logAction } from "@/lib/audit";
 import { requireRole } from "@/lib/auth";
 import { parseLocalDateTime } from "@/lib/dates";
 
@@ -10,7 +11,7 @@ const PATH = "/espace/jeunesse";
 const text = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
 
 export async function addEvent(formData: FormData) {
-  await requireRole("jeunesse");
+  const staff = await requireRole("jeunesse");
   const title = text(formData, "title");
   const startsAt = parseLocalDateTime(text(formData, "startsAt"));
   if (!title || !startsAt) return;
@@ -23,31 +24,35 @@ export async function addEvent(formData: FormData) {
     isPublic: formData.get("isPublic") === "on",
   });
   updateTag("public");
+  await logAction(staff, "addEvent", "jeunesse");
   revalidatePath(PATH);
 }
 
 export async function deleteEvent(id: number) {
-  await requireRole("jeunesse");
+  const staff = await requireRole("jeunesse");
   await db.delete(events).where(eq(events.id, id));
   updateTag("public");
+  await logAction(staff, "deleteEvent", "jeunesse");
   revalidatePath(PATH);
 }
 
 export async function addYouth(formData: FormData) {
-  await requireRole("jeunesse");
+  const staff = await requireRole("jeunesse");
   const firstName = text(formData, "firstName");
   const lastName = text(formData, "lastName");
   if (!firstName || !lastName) return;
   await db.insert(members).values({ firstName, lastName, phone: text(formData, "phone") || null, department: "jeunesse" });
+  await logAction(staff, "addYouth", "jeunesse");
   revalidatePath(PATH);
 }
 
 export async function saveAttendance(eventId: number, formData: FormData) {
-  await requireRole("jeunesse");
+  const staff = await requireRole("jeunesse");
   const present = formData.getAll("present").map(Number).filter(Number.isInteger);
   await db.delete(attendance).where(eq(attendance.eventId, eventId));
   if (present.length) {
     await db.insert(attendance).values(present.map((memberId) => ({ eventId, memberId })));
   }
+  await logAction(staff, "saveAttendance", "jeunesse");
   revalidatePath(PATH);
 }

@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 
 const TZ = "America/Indiana/Indianapolis";
 
-type Slot = { weekday: number; hour: number; minute: number; nom: string; heure: string };
+export type Slot = { weekday: number; hour: number; minute: number; nom: string; heure: string };
+export type CountdownLabels = { now: string; next: string; days: readonly string[]; d: string; h: string; min: string };
 
 /** Prochain rendez-vous (heure d'Indianapolis) et temps restant. */
 function nextSlot(slots: Slot[], now: Date) {
@@ -25,7 +26,7 @@ function nextSlot(slots: Slot[], now: Date) {
   return best!;
 }
 
-export function Countdown({ slots }: { slots: Slot[] }) {
+export function Countdown({ slots, labels }: { slots: Slot[]; labels: CountdownLabels }) {
   const [state, setState] = useState<{ slot: Slot; minutes: number } | null>(null);
   useEffect(() => {
     const tick = () => setState(nextSlot(slots, new Date()));
@@ -40,21 +41,20 @@ export function Countdown({ slots }: { slots: Slot[] }) {
   const days = Math.floor(minutes / 1440);
   const hours = Math.floor((minutes % 1440) / 60);
   const mins = minutes % 60;
-  const jour = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"][slot.weekday];
 
   return (
     <div>
       <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-gold">
         <span className={`h-2 w-2 rounded-full ${live ? "animate-pulse bg-red-500" : "bg-gold"}`} />
-        {live ? "En ce moment" : "Prochain rendez-vous"}
+        {live ? labels.now : labels.next}
       </p>
       <p className="mt-2 font-display text-2xl font-semibold leading-tight">{slot.nom}</p>
-      <p className="text-sm text-white/70">{jour} · {slot.heure}</p>
+      <p className="text-sm text-white/70">{labels.days[slot.weekday]} · {slot.heure}</p>
       {!live && (
-        <p className="mt-3 flex gap-4 font-display text-3xl font-semibold tabular-nums" aria-label={`Dans ${days} jours ${hours} heures ${mins} minutes`}>
-          {days > 0 && <span>{days}<span className="ml-1 text-sm font-normal text-white/60">j</span></span>}
-          <span>{hours}<span className="ml-1 text-sm font-normal text-white/60">h</span></span>
-          <span>{String(mins).padStart(2, "0")}<span className="ml-1 text-sm font-normal text-white/60">min</span></span>
+        <p className="mt-3 flex gap-4 font-display text-3xl font-semibold tabular-nums">
+          {days > 0 && <span>{days}<span className="ml-1 text-sm font-normal text-white/60">{labels.d}</span></span>}
+          <span>{hours}<span className="ml-1 text-sm font-normal text-white/60">{labels.h}</span></span>
+          <span>{String(mins).padStart(2, "0")}<span className="ml-1 text-sm font-normal text-white/60">{labels.min}</span></span>
         </p>
       )}
     </div>

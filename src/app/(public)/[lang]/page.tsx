@@ -2,6 +2,7 @@ import { and, asc, desc, eq, gte } from "drizzle-orm";
 import { ArrowDown, ArrowRight, ArrowUpRight, PlayCircle } from "lucide-react";
 import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 import { eglise } from "@/config/eglise";
 import { announcements, db, events } from "@/db";
 import { Countdown } from "@/components/countdown";
@@ -9,6 +10,8 @@ import { Marquee } from "@/components/marquee";
 import { Reveal } from "@/components/reveal";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { getDictionary } from "@/i18n/dictionaries";
+import { hasLocale, type Locale } from "@/i18n/locales";
 
 async function getPublicContent() {
   "use cache";
@@ -21,37 +24,29 @@ async function getPublicContent() {
   return { news, upcoming };
 }
 
-// Créneaux pour le compte à rebours (0 = dimanche … 6 = samedi)
-const SLOTS = [
-  { weekday: 6, hour: 9, minute: 30, nom: "École du Sabbat", heure: "9h30" },
-  { weekday: 6, hour: 11, minute: 0, nom: "Culte divin", heure: "11h00" },
-  { weekday: 6, hour: 16, minute: 0, nom: "Jeunesse Adventiste", heure: "16h00" },
-  { weekday: 3, hour: 19, minute: 0, nom: "Réunion de prière", heure: "19h00" },
-];
+const PHOTOS = [eglise.photos.louange, eglise.photos.jeunesse, eglise.photos.enfants, eglise.photos.priere, eglise.photos.assemblee];
 
-const MINISTERES = [
-  { n: "01", name: "Louange", sub: "Chorale & musiciens", photo: eglise.photos.louange },
-  { n: "02", name: "Jeunesse", sub: "JA · 13-30 ans", photo: eglise.photos.jeunesse },
-  { n: "03", name: "Enfants", sub: "École du Sabbat", photo: eglise.photos.enfants },
-  { n: "04", name: "Prière", sub: "Intercession & visites", photo: eglise.photos.priere },
-  { n: "05", name: "Communauté", sub: "Accueil & repas", photo: eglise.photos.communaute },
-];
-
-const dateParts = new Intl.DateTimeFormat("fr-FR", { timeZone: "America/Indiana/Indianapolis", day: "2-digit", month: "short", weekday: "long", hour: "2-digit", minute: "2-digit" });
-function parts(d: Date) {
-  const p = Object.fromEntries(dateParts.formatToParts(d).map((x) => [x.type, x.value]));
-  return { day: p.day, month: p.month.replace(".", ""), weekday: p.weekday, time: `${p.hour}h${p.minute}` };
+function dateParts(d: Date, lang: Locale) {
+  const f = new Intl.DateTimeFormat(lang === "fr" ? "fr-FR" : "en-US", { timeZone: "America/Indiana/Indianapolis", day: "2-digit", month: "short", weekday: "long", hour: "2-digit", minute: "2-digit", hour12: lang === "en" });
+  const p = Object.fromEntries(f.formatToParts(d).map((x) => [x.type, x.value]));
+  const time = lang === "fr" ? `${p.hour}h${p.minute}` : `${p.hour}:${p.minute} ${p.dayPeriod ?? ""}`.trim();
+  return { day: p.day, month: p.month.replace(".", ""), weekday: p.weekday, time };
 }
 
-export default async function Home() {
-  const { news, upcoming } = await getPublicContent();
+export default async function Home({ params }: PageProps<"/[lang]">) {
+  const { lang } = await params;
+  if (!hasLocale(lang)) notFound();
+  const [t, { news, upcoming }] = await Promise.all([getDictionary(lang), getPublicContent()]);
+  const x = eglise.t(lang);
+  const slots = eglise.creneaux.map((c) => ({ ...c, nom: x.cultes[c.index].nom, heure: x.cultes[c.index].heure }));
+  const pick = (fr: string, en: string | null) => (lang === "en" && en ? en : fr);
+
   return (
     <>
-      <SiteHeader />
+      <SiteHeader lang={lang} nav={t.nav} sousTitre={x.sousTitre} />
       <main className="flex-1">
         {/* ---------- Héros : photo fondue à droite ---------- */}
         <section className="relative isolate overflow-hidden bg-bg">
-          {/* Photo (desktop) : bord gauche fondu dans le fond */}
           <div
             className="bloom absolute inset-y-0 right-0 hidden w-[58%] lg:block"
             style={{
@@ -61,55 +56,53 @@ export default async function Home() {
               WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 38%)",
             }}
           >
-            <Image src={eglise.photos.hero} alt="Assemblée pendant le culte" fill priority sizes="58vw" className="object-cover object-[75%_center]" />
+            <Image src={eglise.photos.hero} alt={t.hero.photoAlt} fill priority sizes="58vw" className="object-cover object-[75%_center]" />
             <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-bg to-transparent" />
           </div>
           <div className="absolute -top-40 left-[20%] h-[36rem] w-[36rem] rounded-full bg-gold/15 blur-3xl" />
           <div className="absolute -bottom-40 -left-40 h-[30rem] w-[30rem] rounded-full bg-accent/10 blur-3xl" />
 
           <div className="relative mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-center px-5 pt-32 pb-24 sm:px-8 lg:pt-28">
-            <p className="rise text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">Indianapolis · Francophone · Adventiste</p>
+            <p className="rise text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{t.hero.eyebrow}</p>
             <h1 className="mt-8 font-display text-[clamp(3.4rem,10vw,8.5rem)] leading-[0.9] font-semibold tracking-tight text-night">
-              <span className="rise block" style={{ animationDelay: "80ms" }}>Une famille</span>
-              <span className="rise block" style={{ animationDelay: "180ms" }}>pour croire,</span>
-              <span className="rise block" style={{ animationDelay: "280ms" }}>grandir et</span>
-              <span className="rise block font-display-italic font-normal text-accent" style={{ animationDelay: "380ms" }}>servir ensemble.</span>
+              <span className="rise block" style={{ animationDelay: "80ms" }}>{t.hero.l1}</span>
+              <span className="rise block" style={{ animationDelay: "180ms" }}>{t.hero.l2}</span>
+              <span className="rise block" style={{ animationDelay: "280ms" }}>{t.hero.l3}</span>
+              <span className="rise block font-display-italic font-normal text-accent" style={{ animationDelay: "380ms" }}>{t.hero.l4}</span>
             </h1>
-            <p className="rise mt-8 max-w-md text-lg text-muted text-pretty" style={{ animationDelay: "520ms" }}>
-              Une église où l’on vous appelle par votre prénom. Venez comme vous êtes, ce Sabbat.
-            </p>
+            <p className="rise mt-8 max-w-md text-lg text-muted text-pretty" style={{ animationDelay: "520ms" }}>{t.hero.text}</p>
             <div className="rise mt-10 flex flex-wrap items-center gap-6" style={{ animationDelay: "640ms" }}>
               <a href="#venir" className="group inline-flex items-center gap-3 rounded-full bg-accent py-3.5 pr-2 pl-7 text-sm font-semibold text-white shadow-xl shadow-accent/25 transition hover:bg-accent-strong">
-                Venir ce Sabbat
+                {t.hero.cta}
                 <span className="grid h-10 w-10 place-items-center rounded-full bg-gold text-night transition group-hover:translate-x-0.5"><ArrowRight className="h-4 w-4" /></span>
               </a>
               <a href={eglise.youtube} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-ink/80 hover:text-accent">
-                <PlayCircle className="h-6 w-6 text-accent" /> Culte en direct
+                <PlayCircle className="h-6 w-6 text-accent" /> {t.hero.live}
               </a>
             </div>
 
             {/* Photo + compte à rebours (mobile / tablette) */}
             <div className="bloom relative mt-14 lg:hidden" style={{ animationDelay: "300ms" }}>
               <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-2xl">
-                <Image src={eglise.photos.hero} alt="Culte à l'église" fill priority sizes="90vw" className="object-cover" />
+                <Image src={eglise.photos.hero} alt={t.hero.photoAlt} fill priority sizes="90vw" className="object-cover" />
               </div>
               <div className="relative -mt-10 ml-auto w-[85%] rounded-3xl bg-night p-6 text-white shadow-2xl sm:w-[60%]">
-                <Countdown slots={SLOTS} />
+                <Countdown slots={slots} labels={t.countdown} />
               </div>
             </div>
 
             <a href="#venir" className="rise absolute bottom-8 left-5 hidden items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted hover:text-accent sm:left-8 lg:flex" style={{ animationDelay: "900ms" }}>
-              <span className="bob grid h-9 w-9 place-items-center rounded-full border border-line bg-surface text-accent"><ArrowDown className="h-4 w-4" /></span> Découvrir
+              <span className="bob grid h-9 w-9 place-items-center rounded-full border border-line bg-surface text-accent"><ArrowDown className="h-4 w-4" /></span> {t.hero.discover}
             </a>
 
             {/* Compte à rebours sur la photo (desktop) */}
             <div className="bloom absolute right-5 bottom-10 hidden w-80 rounded-3xl bg-night/95 p-7 text-white shadow-2xl backdrop-blur lg:block sm:right-8" style={{ animationDelay: "700ms" }}>
-              <Countdown slots={SLOTS} />
+              <Countdown slots={slots} labels={t.countdown} />
             </div>
           </div>
 
           <div className="relative bg-accent py-4 text-white">
-            <Marquee items={["Bienvenue", "Byenveni", "Welcome", "Bienvenido", "Karibu", "Shalom"]} />
+            <Marquee items={[...t.marquee]} />
           </div>
         </section>
 
@@ -117,15 +110,15 @@ export default async function Home() {
         <section id="venir" className="mx-auto max-w-7xl px-5 py-24 sm:px-8">
           <div className="grid gap-10 lg:grid-cols-[1fr_2fr]">
             <Reveal>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">Venir</p>
-              <h2 className="mt-4 font-display text-4xl leading-tight font-semibold text-balance text-night sm:text-5xl">Votre premier Sabbat, en toute simplicité.</h2>
-              <p className="mt-5 text-muted text-pretty">Venez comme vous êtes. Quelqu’un vous accueillera à la porte, vous aidera à trouver une place et répondra à vos questions.</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{t.venir.eyebrow}</p>
+              <h2 className="mt-4 font-display text-4xl leading-tight font-semibold text-balance text-night sm:text-5xl">{t.venir.title}</h2>
+              <p className="mt-5 text-muted text-pretty">{t.venir.text}</p>
               <a href={eglise.carte} target="_blank" rel="noreferrer" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline">
                 {eglise.adresse} <ArrowUpRight className="h-4 w-4" />
               </a>
             </Reveal>
             <div>
-              {eglise.cultes.map((c, i) => (
+              {x.cultes.map((c, i) => (
                 <Reveal key={c.nom} delay={i * 70}>
                   <div className="group grid grid-cols-[3.5rem_1fr_auto] items-baseline gap-4 border-t hairline py-6 transition hover:bg-subtle sm:grid-cols-[4rem_1fr_auto] sm:px-3">
                     <span className="font-display-italic text-2xl text-gold">0{i + 1}</span>
@@ -151,23 +144,23 @@ export default async function Home() {
             <Reveal>
               <div className="flex flex-wrap items-end justify-between gap-6">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">Ministères</p>
-                  <h2 className="mt-4 font-display text-4xl leading-tight font-semibold text-night sm:text-5xl">Chacun a sa place.</h2>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{t.ministeres.eyebrow}</p>
+                  <h2 className="mt-4 font-display text-4xl leading-tight font-semibold text-night sm:text-5xl">{t.ministeres.title}</h2>
                 </div>
                 <a href="#contact" className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline">
-                  Envie de servir ? Parlez-nous <ArrowUpRight className="h-4 w-4" />
+                  {t.ministeres.serve} <ArrowUpRight className="h-4 w-4" />
                 </a>
               </div>
             </Reveal>
             {/* Mobile : bande à faire défiler · Desktop : rangée de cinq */}
             <div className="snap-x-scroll -mx-5 mt-10 flex gap-4 overflow-x-auto px-5 pb-2 sm:-mx-8 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-5 lg:overflow-visible lg:px-0">
-              {MINISTERES.map((m, i) => (
-                <Reveal key={m.n} delay={i * 60} className="w-[16rem] shrink-0 lg:w-auto">
+              {t.ministeres.items.map((m, i) => (
+                <Reveal key={m.name} delay={i * 60} className="w-[16rem] shrink-0 lg:w-auto">
                   <article className="group relative aspect-[3/4] overflow-hidden rounded-[1.5rem] lg:aspect-[4/5]">
-                    <Image src={m.photo} alt="" fill sizes="(min-width:1024px) 20vw, 16rem" className="object-cover transition duration-700 group-hover:scale-105" />
+                    <Image src={PHOTOS[i]} alt="" fill sizes="(min-width:1024px) 20vw, 16rem" className="object-cover transition duration-700 group-hover:scale-105" />
                     <div className="absolute inset-0 bg-gradient-to-t from-night via-night/20 to-transparent" />
                     <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-                      <p className="font-display-italic text-lg text-gold">{m.n}</p>
+                      <p className="font-display-italic text-lg text-gold">0{i + 1}</p>
                       <h3 className="font-display text-2xl font-semibold">{m.name}</h3>
                       <p className="text-xs text-white/70">{m.sub}</p>
                     </div>
@@ -188,11 +181,11 @@ export default async function Home() {
                 <div className="absolute -right-3 -bottom-3 h-24 w-24 rounded-full bg-gold" />
               </div>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">Mot d’accueil</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{t.mot.eyebrow}</p>
                 <p className="mt-6 font-display text-2xl leading-snug font-medium text-pretty sm:text-3xl">
-                  <span className="font-display-italic text-5xl text-gold">«</span> {eglise.motDuPasteur.texte}
+                  <span className="font-display-italic text-5xl text-gold">«</span> {x.motDuPasteur.texte}
                 </p>
-                <p className="mt-6 font-display-italic text-xl text-muted">— {eglise.motDuPasteur.auteur}</p>
+                <p className="mt-6 font-display-italic text-xl text-muted">— {x.motDuPasteur.auteur}</p>
               </div>
             </div>
           </Reveal>
@@ -207,14 +200,14 @@ export default async function Home() {
                 <span className="absolute inset-0 grid place-items-center">
                   <span className="grid h-20 w-20 place-items-center rounded-full bg-gold text-night shadow-xl transition group-hover:scale-110"><PlayCircle className="h-10 w-10" /></span>
                 </span>
-                <span className="absolute top-5 left-5 rounded-full bg-night/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white backdrop-blur">Chaque Sabbat · 11h00</span>
+                <span className="absolute top-5 left-5 rounded-full bg-night/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white backdrop-blur">{t.messages.badge}</span>
               </a>
             </Reveal>
             <Reveal delay={100}>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">Messages</p>
-              <h2 className="mt-4 font-display text-4xl leading-tight font-semibold text-balance text-night sm:text-5xl">Loin d’Indianapolis ? Le culte vient à vous.</h2>
-              <p className="mt-5 text-muted text-pretty">Chaque Sabbat, le culte est diffusé en direct sur YouTube. Retrouvez aussi les messages précédents pour les réécouter ou les partager.</p>
-              <a href={eglise.youtube} target="_blank" rel="noreferrer" className="mt-6 inline-flex items-center gap-2 font-semibold text-accent hover:underline">Voir la chaîne YouTube <ArrowUpRight className="h-4 w-4" /></a>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{t.messages.eyebrow}</p>
+              <h2 className="mt-4 font-display text-4xl leading-tight font-semibold text-balance text-night sm:text-5xl">{t.messages.title}</h2>
+              <p className="mt-5 text-muted text-pretty">{t.messages.text}</p>
+              <a href={eglise.youtube} target="_blank" rel="noreferrer" className="mt-6 inline-flex items-center gap-2 font-semibold text-accent hover:underline">{t.messages.cta} <ArrowUpRight className="h-4 w-4" /></a>
             </Reveal>
           </div>
         </section>
@@ -223,14 +216,14 @@ export default async function Home() {
         <section id="agenda" className="mx-auto max-w-7xl px-5 py-24 sm:px-8">
           <div className="grid gap-12 lg:grid-cols-[1fr_1fr]">
             <Reveal>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">Agenda</p>
-              <h2 className="mt-4 font-display text-4xl font-semibold text-night sm:text-5xl">À venir</h2>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{t.agenda.eyebrow}</p>
+              <h2 className="mt-4 font-display text-4xl font-semibold text-night sm:text-5xl">{t.agenda.title}</h2>
               {upcoming.length === 0 ? (
-                <p className="mt-8 border-t hairline pt-6 text-muted">Les prochains événements seront annoncés ici. En attendant, rejoignez-nous ce Sabbat !</p>
+                <p className="mt-8 border-t hairline pt-6 text-muted">{t.agenda.empty}</p>
               ) : (
                 <ul className="mt-8">
                   {upcoming.map((e) => {
-                    const d = parts(e.startsAt);
+                    const d = dateParts(e.startsAt, lang);
                     return (
                       <li key={e.id} className="grid grid-cols-[4.5rem_1fr] gap-5 border-t hairline py-5">
                         <span className="text-center">
@@ -238,7 +231,7 @@ export default async function Home() {
                           <span className="block text-xs font-semibold uppercase tracking-wider text-muted">{d.month}</span>
                         </span>
                         <span>
-                          <span className="block font-display text-xl font-semibold">{e.title}</span>
+                          <span className="block font-display text-xl font-semibold">{pick(e.title, e.titleEn)}</span>
                           <span className="block text-sm text-muted capitalize">{d.weekday} · {d.time}{e.location ? ` · ${e.location}` : ""}</span>
                         </span>
                       </li>
@@ -248,16 +241,16 @@ export default async function Home() {
               )}
             </Reveal>
             <Reveal delay={100}>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">Annonces</p>
-              <h2 className="mt-4 font-display text-4xl font-semibold text-night sm:text-5xl">Vie de l’église</h2>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{t.agenda.newsEyebrow}</p>
+              <h2 className="mt-4 font-display text-4xl font-semibold text-night sm:text-5xl">{t.agenda.newsTitle}</h2>
               {news.length === 0 ? (
-                <p className="mt-8 border-t hairline pt-6 text-muted">Aucune annonce pour le moment.</p>
+                <p className="mt-8 border-t hairline pt-6 text-muted">{t.agenda.newsEmpty}</p>
               ) : (
                 <ul className="mt-8 space-y-4">
                   {news.map((a) => (
                     <li key={a.id} className="rounded-3xl border-l-4 border-gold bg-surface p-6 shadow-sm">
-                      <p className="font-display text-xl font-semibold text-night">{a.title}</p>
-                      <p className="mt-2 text-sm whitespace-pre-line text-muted">{a.body}</p>
+                      <p className="font-display text-xl font-semibold text-night">{pick(a.title, a.titleEn)}</p>
+                      <p className="mt-2 text-sm whitespace-pre-line text-muted">{pick(a.body, a.bodyEn)}</p>
                     </li>
                   ))}
                 </ul>
@@ -272,8 +265,8 @@ export default async function Home() {
           <div className="relative mx-auto max-w-5xl px-5 py-28 text-center sm:px-8">
             <Reveal>
               <span className="font-display-italic text-7xl leading-none text-gold">“</span>
-              <p className="mt-2 font-display text-3xl leading-snug font-medium text-balance sm:text-5xl">{eglise.verset.texte}</p>
-              <p className="mt-8 text-[11px] font-semibold uppercase tracking-[0.28em] text-gold">{eglise.verset.reference}</p>
+              <p className="mt-2 font-display text-3xl leading-snug font-medium text-balance sm:text-5xl">{x.verset.texte}</p>
+              <p className="mt-8 text-[11px] font-semibold uppercase tracking-[0.28em] text-gold">{x.verset.reference}</p>
             </Reveal>
           </div>
         </section>
@@ -282,12 +275,12 @@ export default async function Home() {
         <section className="bg-gold text-night">
           <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-20 sm:px-8 md:grid-cols-[1fr_auto]">
             <Reveal>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-night/60">Dîmes & offrandes</p>
-              <h2 className="mt-4 font-display text-4xl leading-tight font-semibold text-balance sm:text-6xl">Soutenir la mission, <span className="font-display-italic font-normal">en un clic.</span></h2>
-              <p className="mt-4 max-w-xl text-night/70">Vos dons passent par AdventistGiving, la plateforme sécurisée de l’Église adventiste. Reçu fiscal automatique.</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-night/60">{t.don.eyebrow}</p>
+              <h2 className="mt-4 font-display text-4xl leading-tight font-semibold text-balance sm:text-6xl">{t.don.title} <span className="font-display-italic font-normal">{t.don.titleItalic}</span></h2>
+              <p className="mt-4 max-w-xl text-night/70">{t.don.text}</p>
             </Reveal>
             <a href={eglise.don} target="_blank" rel="noreferrer" className="group inline-flex items-center gap-3 rounded-full bg-night py-3 pr-2 pl-7 text-sm font-semibold text-white transition hover:bg-night-2">
-              Donner en ligne
+              {t.don.cta}
               <span className="grid h-10 w-10 place-items-center rounded-full bg-gold text-night transition group-hover:translate-x-0.5"><ArrowUpRight className="h-4 w-4" /></span>
             </a>
           </div>
@@ -297,21 +290,21 @@ export default async function Home() {
         <section id="contact" className="mx-auto max-w-7xl px-5 py-24 sm:px-8">
           <div className="grid gap-10 lg:grid-cols-[1fr_1.2fr]">
             <Reveal>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">Contact</p>
-              <h2 className="mt-4 font-display text-4xl font-semibold text-night sm:text-5xl">Venez nous voir.</h2>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{t.contact.eyebrow}</p>
+              <h2 className="mt-4 font-display text-4xl font-semibold text-night sm:text-5xl">{t.contact.title}</h2>
               <dl className="mt-8 divide-y hairline">
                 <div className="py-4">
-                  <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted">Adresse</dt>
+                  <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted">{t.contact.address}</dt>
                   <dd className="mt-1 font-display text-xl">{eglise.adresse}</dd>
-                  <a href={eglise.carte} target="_blank" rel="noreferrer" className="text-sm font-semibold text-accent hover:underline">Itinéraire ↗</a>
+                  <a href={eglise.carte} target="_blank" rel="noreferrer" className="text-sm font-semibold text-accent hover:underline">{t.contact.directions} ↗</a>
                 </div>
                 <div className="py-4">
-                  <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted">E-mail</dt>
+                  <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted">{t.contact.email}</dt>
                   <dd className="mt-1 font-display text-xl"><a href={`mailto:${eglise.email}`} className="hover:text-accent">{eglise.email}</a></dd>
                 </div>
                 {eglise.telephone && (
                   <div className="py-4">
-                    <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted">Téléphone</dt>
+                    <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted">{t.contact.phone}</dt>
                     <dd className="mt-1 font-display text-xl">{eglise.telephone}</dd>
                   </div>
                 )}
@@ -319,13 +312,13 @@ export default async function Home() {
             </Reveal>
             <Reveal delay={100}>
               <div className="h-80 overflow-hidden rounded-[2rem] border hairline shadow-xl lg:h-full lg:min-h-[24rem]">
-                <iframe title="Plan d'accès" src={eglise.carteEmbed} className="h-full w-full" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+                <iframe title={t.contact.map} src={eglise.carteEmbed} className="h-full w-full" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
               </div>
             </Reveal>
           </div>
         </section>
       </main>
-      <SiteFooter />
+      <SiteFooter lang={lang} t={{ ...t.footer, espace: t.nav.espace }} />
     </>
   );
 }

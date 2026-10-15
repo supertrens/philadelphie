@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "description": "Église adventiste francophone au cœur d'Indianapolis. Cultes le Sabbat, École du Sabbat, jeunesse, louange et une communauté chaleureuse qui vous attend."
+  },
+  "nav": {
+    "venir": "Venir",
+    "ministeres": "Ministères",
+    "messages": "Messages",
+    "agenda": "Agenda",
+    "contact": "Contact",
+    "donner": "Donner",
+    "donnerLong": "Donner en ligne",
+    "espace": "Espace membres",
+    "switch": "English",
+    "switchAria": "Switch to English",
+    "menuOpen": "Ouvrir le menu",
+    "menuClose": "Fermer le menu"
+  },
+  "hero": {
+    "eyebrow": "Indianapolis · Francophone · Adventiste",
+    "l1": "Une famille",
+    "l2": "pour croire,",
+    "l3": "grandir et",
+    "l4": "servir ensemble.",
+    "text": "Une église où l’on vous appelle par votre prénom. Venez comme vous êtes, ce Sabbat.",
+    "cta": "Venir ce Sabbat",
+    "live": "Culte en direct",
+    "discover": "Découvrir",
+    "photoAlt": "Assemblée pendant le culte"
+  },
+  "countdown": {
+    "now": "En ce moment",
+    "next": "Prochain rendez-vous",
+    "days": ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"],
+    "d": "j",
+    "h": "h",
+    "min": "min"
+  },
+  "marquee": ["Bienvenue", "Byenveni", "Welcome", "Bienvenido", "Karibu", "Shalom"],
+  "venir": {
+    "eyebrow": "Venir",
+    "title": "Votre premier Sabbat, en toute simplicité.",
+    "text": "Venez comme vous êtes. Quelqu’un vous accueillera à la porte, vous aidera à trouver une place et répondra à vos questions."
+  },
+  "ministeres": {
+    "eyebrow": "Ministères",
+    "title": "Chacun a sa place.",
+    "serve": "Envie de servir ? Parlez-nous",
+    "items": [
+      { "name": "Louange", "sub": "Chorale & musiciens" },
+      { "name": "Jeunesse", "sub": "JA · 13-30 ans" },
+      { "name": "Enfants", "sub": "École du Sabbat" },
+      { "name": "Prière", "sub": "Intercession & visites" },
+      { "name": "Communauté", "sub": "Accueil & repas" }
+    ]
+  },
+  "mot": { "eyebrow": "Mot d’accueil" },
+  "messages": {
+    "eyebrow": "Messages",
+    "badge": "Chaque Sabbat · 11h00",
+    "title": "Loin d’Indianapolis ? Le culte vient à vous.",
+    "text": "Chaque Sabbat, le culte est diffusé en direct sur YouTube. Retrouvez aussi les messages précédents pour les réécouter ou les partager.",
+    "cta": "Voir la chaîne YouTube"
+  },
+  "agenda": {
+    "eyebrow": "Agenda",
+    "title": "À venir",
+    "empty": "Les prochains événements seront annoncés ici. En attendant, rejoignez-nous ce Sabbat !",
+    "newsEyebrow": "Annonces",
+    "newsTitle": "Vie de l’église",
+    "newsEmpty": "Aucune annonce pour le moment."
+  },
+  "don": {
+    "eyebrow": "Dîmes & offrandes",
+    "title": "Soutenir la mission,",
+    "titleItalic": "en un clic.",
+    "text": "Vos dons passent par AdventistGiving, la plateforme sécurisée de l’Église adventiste. Reçu fiscal automatique.",
+    "cta": "Donner en ligne"
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "Venez nous voir.",
+    "address": "Adresse",
+    "directions": "Itinéraire",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "map": "Plan d’accès"
+  },
+  "footer": {
+    "rdv": "Rendez-vous",
+    "find": "Nous trouver",
+    "directions": "Itinéraire"
+  }
+}

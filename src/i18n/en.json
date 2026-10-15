@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "description": "A French-speaking Seventh-day Adventist church in the heart of Indianapolis. Sabbath worship, Sabbath School, youth, praise and a warm community waiting for you."
+  },
+  "nav": {
+    "venir": "Visit",
+    "ministeres": "Ministries",
+    "messages": "Sermons",
+    "agenda": "Events",
+    "contact": "Contact",
+    "donner": "Give",
+    "donnerLong": "Give online",
+    "espace": "Members area",
+    "switch": "Français",
+    "switchAria": "Passer en français",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu"
+  },
+  "hero": {
+    "eyebrow": "Indianapolis · French-speaking · Adventist",
+    "l1": "A family",
+    "l2": "to believe,",
+    "l3": "to grow and",
+    "l4": "to serve together.",
+    "text": "A church where people know your name. Come as you are, this Sabbath.",
+    "cta": "Join us this Sabbath",
+    "live": "Watch live",
+    "discover": "Discover",
+    "photoAlt": "Congregation during worship"
+  },
+  "countdown": {
+    "now": "Happening now",
+    "next": "Next gathering",
+    "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    "d": "d",
+    "h": "h",
+    "min": "min"
+  },
+  "marquee": ["Welcome", "Bienvenue", "Byenveni", "Bienvenido", "Karibu", "Shalom"],
+  "venir": {
+    "eyebrow": "Visit",
+    "title": "Your first Sabbath, made simple.",
+    "text": "Come as you are. Someone will greet you at the door, help you find a seat and answer your questions."
+  },
+  "ministeres": {
+    "eyebrow": "Ministries",
+    "title": "There is a place for everyone.",
+    "serve": "Want to serve? Talk to us",
+    "items": [
+      { "name": "Praise", "sub": "Choir & musicians" },
+      { "name": "Youth", "sub": "AY · ages 13-30" },
+      { "name": "Children", "sub": "Sabbath School" },
+      { "name": "Prayer", "sub": "Intercession & visits" },
+      { "name": "Community", "sub": "Welcome & fellowship meals" }
+    ]
+  },
+  "mot": { "eyebrow": "A word of welcome" },
+  "messages": {
+    "eyebrow": "Sermons",
+    "badge": "Every Sabbath · 11:00 AM",
+    "title": "Far from Indianapolis? Worship comes to you.",
+    "text": "Every Sabbath the service is streamed live on YouTube. Previous sermons are there too, to listen again or share.",
+    "cta": "Visit the YouTube channel"
+  },
+  "agenda": {
+    "eyebrow": "Events",
+    "title": "Coming up",
+    "empty": "Upcoming events will be announced here. Until then, join us this Sabbath!",
+    "newsEyebrow": "Announcements",
+    "newsTitle": "Church life",
+    "newsEmpty": "No announcements right now."
+  },
+  "don": {
+    "eyebrow": "Tithes & offerings",
+    "title": "Support the mission,",
+    "titleItalic": "in one click.",
+    "text": "Gifts go through AdventistGiving, the Adventist Church’s secure platform. Automatic tax receipt.",
+    "cta": "Give online"
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "Come and see us.",
+    "address": "Address",
+    "directions": "Directions",
+    "email": "Email",
+    "phone": "Phone",
+    "map": "Map"
+  },
+  "footer": {
+    "rdv": "Gatherings",
+    "find": "Find us",
+    "directions": "Directions"
+  }
+}

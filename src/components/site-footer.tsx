@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { eglise } from "@/config/eglise";
+import type { Locale } from "@/i18n/locales";
 import { Logo } from "./logo";
 
-export function SiteFooter() {
+export function SiteFooter({ lang, t }: { lang: Locale; t: { rdv: string; find: string; directions: string; espace: string } }) {
+  const x = eglise.t(lang);
   return (
     <footer className="relative overflow-hidden bg-night text-white/70">
       <p aria-hidden="true" className="text-outline pointer-events-none absolute -bottom-6 left-0 w-full select-none whitespace-nowrap font-display text-[22vw] leading-none font-semibold">
@@ -14,15 +16,15 @@ export function SiteFooter() {
             <Logo />
             <span>
               <span className="block font-display-italic text-2xl">Philadelphie</span>
-              <span className="block text-[10px] font-semibold uppercase tracking-[0.22em] text-white/60">{eglise.sousTitre}</span>
+              <span className="block text-[10px] font-semibold uppercase tracking-[0.22em] text-white/60">{x.sousTitre}</span>
             </span>
           </div>
-          <p className="mt-5 max-w-md text-sm leading-relaxed text-pretty">{eglise.description}</p>
+          <p className="mt-5 max-w-md text-sm leading-relaxed text-pretty">{x.description}</p>
         </div>
         <div>
-          <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold">Rendez-vous</h3>
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold">{t.rdv}</h3>
           <ul className="mt-4 space-y-2 text-sm">
-            {eglise.cultes.map((c) => (
+            {x.cultes.map((c) => (
               <li key={c.nom} className="flex justify-between gap-4 border-b border-white/10 pb-2">
                 <span>{c.nom}</span><span className="text-white/50">{c.jour.split(" ")[0]} {c.heure}</span>
               </li>
@@ -30,15 +32,15 @@ export function SiteFooter() {
           </ul>
         </div>
         <div>
-          <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold">Nous trouver</h3>
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold">{t.find}</h3>
           <p className="mt-4 text-sm">{eglise.adresse}</p>
-          <a href={eglise.carte} target="_blank" rel="noreferrer" className="mt-1 inline-block text-sm text-white underline underline-offset-4 decoration-gold/60 hover:decoration-gold">Itinéraire</a>
+          <a href={eglise.carte} target="_blank" rel="noreferrer" className="mt-1 inline-block text-sm text-white underline underline-offset-4 decoration-gold/60 hover:decoration-gold">{t.directions}</a>
           <p className="mt-4 text-sm"><a href={`mailto:${eglise.email}`} className="hover:text-white">{eglise.email}</a></p>
           {eglise.telephone && <p className="text-sm">{eglise.telephone}</p>}
           <div className="mt-5 flex flex-wrap gap-2 text-xs">
             <a href={eglise.youtube} target="_blank" rel="noreferrer" className="rounded-full border border-white/20 px-3 py-1.5 hover:border-gold hover:text-white">YouTube</a>
             {eglise.facebook && <a href={eglise.facebook} target="_blank" rel="noreferrer" className="rounded-full border border-white/20 px-3 py-1.5 hover:border-gold hover:text-white">Facebook</a>}
-            <Link href="/espace" className="rounded-full border border-white/20 px-3 py-1.5 hover:border-gold hover:text-white">Espace membres</Link>
+            <Link href="/espace" className="rounded-full border border-white/20 px-3 py-1.5 hover:border-gold hover:text-white">{t.espace}</Link>
           </div>
         </div>
       </div>
