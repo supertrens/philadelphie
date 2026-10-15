@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { logAction } from "@/lib/audit";
 import { requireStaff } from "@/lib/auth";
-import { closeSabbath, getLiveCounts, incrementLive } from "@/lib/comptage";
+import { closeSabbath, getLiveCounts, incrementLive, resetSabbath } from "@/lib/comptage";
 import { CATEGORIES, type Category, type LiveCounts, sabbathDate } from "@/lib/sabbath";
 
 /**
@@ -26,4 +26,14 @@ export async function closeDay() {
   revalidatePath("/espace/comptage");
   revalidatePath("/espace/secretariat");
   revalidatePath("/espace");
+}
+
+/** Remise à zéro : efface les compteurs et les visiteurs inscrits du Sabbat en cours (avant un vrai comptage, après des essais). */
+export async function resetDay() {
+  const staff = await requireStaff();
+  const date = sabbathDate();
+  await resetSabbath(date);
+  await logAction(staff, "remise à zéro comptage", "presence", date);
+  revalidatePath("/espace/comptage");
+  revalidatePath("/espace/secretariat");
 }

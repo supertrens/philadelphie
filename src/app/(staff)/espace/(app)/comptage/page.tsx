@@ -2,13 +2,14 @@ import { Tv } from "lucide-react";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Suspense } from "react";
+import { ConfirmForm } from "@/components/confirm-form";
 import { CopyButton } from "@/components/copy-button";
 import { Button, Card, Empty, PageHeader } from "@/components/ui";
 import { requireStaff } from "@/lib/auth";
 import { getAttendanceHistory, getClosedAttendance, getScreenData } from "@/lib/comptage";
 import { formatSabbath, sabbathDate } from "@/lib/sabbath";
 import { screenToken } from "@/lib/screen-token";
-import { closeDay } from "./actions";
+import { closeDay, resetDay } from "./actions";
 import { Counter } from "./counter";
 
 export const metadata: Metadata = { title: "Comptage du Sabbat" };
@@ -51,6 +52,12 @@ async function Content() {
               : "À la fin du culte, enregistrez les totaux dans l'historique des présences. Vous pourrez encore corriger et clôturer à nouveau. Sans clôture manuelle, les totaux sont enregistrés automatiquement le samedi soir."}
           </p>
           <form action={closeDay}><Button type="submit">{closed ? "Clôturer à nouveau" : "Clôturer"}</Button></form>
+        </div>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+          <p className="max-w-xl text-xs text-muted">Après des essais ou avant de commencer un vrai comptage : remet les trois compteurs à zéro et retire les visiteurs inscrits du jour. Une clôture déjà enregistrée n&apos;est pas modifiée.</p>
+          <ConfirmForm action={resetDay} message={`Remettre à zéro le comptage du ${formatSabbath(date)} ? Les compteurs et les visiteurs inscrits du jour seront effacés.`}>
+            <Button type="submit" variant="danger">Remettre à zéro</Button>
+          </ConfirmForm>
         </div>
       </Card>
 

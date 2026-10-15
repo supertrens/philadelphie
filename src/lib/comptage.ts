@@ -30,6 +30,14 @@ export async function getAttendanceHistory(limit = 12) {
   return db.select().from(servicesAttendance).orderBy(desc(servicesAttendance.date)).limit(limit);
 }
 
+/** Remise à zéro du Sabbat : compteurs et visiteurs inscrits du jour (la clôture déjà faite n'est pas touchée). */
+export async function resetSabbath(date = sabbathDate()) {
+  await Promise.all([
+    db.delete(attendanceLive).where(eq(attendanceLive.date, date)),
+    db.delete(sabbathVisitors).where(eq(sabbathVisitors.date, date)),
+  ]);
+}
+
 /** Visiteurs inscrits pour un Sabbat (ordre d'inscription). */
 export async function getVisitors(date = sabbathDate()): Promise<Visitor[]> {
   return db
