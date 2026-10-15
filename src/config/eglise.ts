@@ -45,6 +45,8 @@ const textes = {
 export const eglise = {
   nom: "Église Adventiste Philadelphie",
   nomCourt: "Philadelphie",
+  // Adresse publique du site (sans barre oblique finale) — utilisée pour le SEO
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "https://philadelphiesdachurch.com",
   adresse: "3642 North Emerson Avenue, Indianapolis, IN",
   carte: "https://maps.google.com/?q=3642+North+Emerson+Avenue,+Indianapolis,+IN",
   carteEmbed: "https://maps.google.com/maps?q=3642+North+Emerson+Avenue,+Indianapolis,+IN&z=15&output=embed",

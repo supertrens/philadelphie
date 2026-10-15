@@ -14,7 +14,11 @@
     "switch": "Français",
     "switchAria": "Passer en français",
     "menuOpen": "Open menu",
-    "menuClose": "Close menu"
+    "menuClose": "Close menu",
+    "direct": "Live",
+    "bulletin": "Bulletin",
+    "priere": "Prayer",
+    "liveNow": "Live now"
   },
   "hero": {
     "eyebrow": "Indianapolis · French-speaking · Adventist",
@@ -26,17 +30,33 @@
     "cta": "Join us this Sabbath",
     "live": "Watch live",
     "discover": "Discover",
-    "photoAlt": "Congregation during worship"
+    "photoAlt": "Congregation during worship",
+    "liveNow": "Worship is live now"
   },
   "countdown": {
     "now": "Happening now",
     "next": "Next gathering",
-    "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    "days": [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
     "d": "d",
     "h": "h",
     "min": "min"
   },
-  "marquee": ["Welcome", "Bienvenue", "Byenveni", "Bienvenido", "Karibu", "Shalom"],
+  "marquee": [
+    "Welcome",
+    "Bienvenue",
+    "Byenveni",
+    "Bienvenido",
+    "Karibu",
+    "Shalom"
+  ],
   "venir": {
     "eyebrow": "Visit",
     "title": "Your first Sabbath, made simple.",
@@ -47,14 +67,31 @@
     "title": "There is a place for everyone.",
     "serve": "Want to serve? Talk to us",
     "items": [
-      { "name": "Praise", "sub": "Choir & musicians" },
-      { "name": "Youth", "sub": "AY · ages 13-30" },
-      { "name": "Children", "sub": "Sabbath School" },
-      { "name": "Prayer", "sub": "Intercession & visits" },
-      { "name": "Community", "sub": "Welcome & fellowship meals" }
+      {
+        "name": "Praise",
+        "sub": "Choir & musicians"
+      },
+      {
+        "name": "Youth",
+        "sub": "AY · ages 13-30"
+      },
+      {
+        "name": "Children",
+        "sub": "Sabbath School"
+      },
+      {
+        "name": "Prayer",
+        "sub": "Intercession & visits"
+      },
+      {
+        "name": "Community",
+        "sub": "Welcome & fellowship meals"
+      }
     ]
   },
-  "mot": { "eyebrow": "A word of welcome" },
+  "mot": {
+    "eyebrow": "A word of welcome"
+  },
   "messages": {
     "eyebrow": "Sermons",
     "badge": "Every Sabbath · 11:00 AM",
@@ -90,5 +127,103 @@
     "rdv": "Gatherings",
     "find": "Find us",
     "directions": "Directions"
+  },
+  "common": {
+    "back": "Back",
+    "home": "Home",
+    "share": "Share",
+    "copied": "Link copied!",
+    "listen": "Listen to audio",
+    "download": "Download",
+    "watchYoutube": "Watch on YouTube",
+    "readMore": "Read more",
+    "sending": "Sending…",
+    "required": "Required field",
+    "errorGeneric": "Something went wrong. Please try again in a moment.",
+    "all": "All"
+  },
+  "sermons": {
+    "eyebrow": "Sermons",
+    "title": "Hear the Word again.",
+    "text": "Sabbath messages in video or audio, to watch again, meditate on and share.",
+    "series": "Series",
+    "filterLabel": "Filter by series",
+    "empty": "The first sermons will be published here very soon.",
+    "emptySeries": "No sermons in this series.",
+    "speaker": "Speaker",
+    "scripture": "Scripture",
+    "date": "Date",
+    "audio": "Audio",
+    "video": "Video",
+    "more": "More sermons",
+    "moreInSeries": "In the same series",
+    "noVideo": "This sermon is available as audio.",
+    "metaDescription": "Sermons from Philadelphie Seventh-day Adventist Church, Indianapolis — video and audio."
+  },
+  "live": {
+    "eyebrow": "Live worship",
+    "title": "Worship, live from Philadelphie.",
+    "onTitle": "We are live!",
+    "text": "Every Sabbath at 11:00 AM (Indianapolis time), the service is streamed live. Join us here or on our YouTube channel.",
+    "offText": "No stream is running right now. The next live service starts here every Sabbath at 11:00 AM.",
+    "badge": "Live",
+    "offline": "Offline",
+    "openYoutube": "Open on YouTube",
+    "channel": "Our YouTube channel",
+    "schedule": "Streaming schedule",
+    "lastMessages": "Latest sermons",
+    "metaDescription": "Watch Philadelphie Seventh-day Adventist Church live, every Sabbath at 11:00 AM."
+  },
+  "prayer": {
+    "eyebrow": "Prayer",
+    "title": "Share your burden with us.",
+    "text": "Our pastoral team prays every week for the requests we receive. Your request can stay confidential: it will then be read by the pastoral team only.",
+    "name": "Your first name (optional)",
+    "email": "Your email (optional)",
+    "message": "Your prayer request",
+    "confidential": "Confidential request (read by the pastoral team only)",
+    "submit": "Send my request",
+    "thanksTitle": "Thank you. We are praying with you.",
+    "thanksText": "Your request has been received and will be lifted up in prayer by the pastoral team.",
+    "another": "Send another request",
+    "verse": "Cast all your anxiety on him because he cares for you.",
+    "verseRef": "1 Peter 5:7",
+    "metaDescription": "Send a prayer request to Philadelphie Seventh-day Adventist Church. The pastoral team prays for you."
+  },
+  "contactPage": {
+    "eyebrow": "Contact",
+    "title": "Write to us.",
+    "text": "A question, a visit, a project? Leave us a message and we will get back to you quickly.",
+    "name": "Your name",
+    "email": "Your email",
+    "phone": "Phone (optional)",
+    "subject": "Subject",
+    "message": "Your message",
+    "submit": "Send message",
+    "subjects": [
+      "First visit",
+      "Bible study",
+      "Baptism",
+      "General inquiry",
+      "Partnership / Event",
+      "Other"
+    ],
+    "thanksTitle": "Message received.",
+    "thanksText": "Thank you! We will reply as soon as possible.",
+    "another": "Send another message",
+    "hours": "We are at the church on Sabbath from 9:30 AM to 2:00 PM and on Wednesday evenings at 7:00 PM.",
+    "metaDescription": "Contact Philadelphie Seventh-day Adventist Church in Indianapolis: address, email and contact form."
+  },
+  "bulletin": {
+    "eyebrow": "Bulletin",
+    "title": "This week’s bulletin.",
+    "text": "Order of service, announcements and the week’s gatherings, all in one document.",
+    "latest": "Latest bulletin",
+    "weekOf": "Sabbath of",
+    "archive": "Archive",
+    "empty": "The first bulletin will be published soon.",
+    "open": "Open the PDF",
+    "preview": "Bulletin preview",
+    "metaDescription": "Weekly bulletin of Philadelphie Seventh-day Adventist Church: order of service and announcements."
   }
 }

@@ -1,49 +1,56 @@
-import { and, asc, desc, eq, gte } from "drizzle-orm";
 import { ArrowDown, ArrowRight, ArrowUpRight, PlayCircle } from "lucide-react";
-import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { eglise } from "@/config/eglise";
-import { announcements, db, events } from "@/db";
 import { Countdown } from "@/components/countdown";
+import { LiveBadge } from "@/components/live-badge";
 import { Marquee } from "@/components/marquee";
 import { Reveal } from "@/components/reveal";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getDictionary } from "@/i18n/dictionaries";
 import { hasLocale, type Locale } from "@/i18n/locales";
-
-async function getPublicContent() {
-  "use cache";
-  cacheTag("public");
-  cacheLife("minutes");
-  const [news, upcoming] = await Promise.all([
-    db.select().from(announcements).where(eq(announcements.published, true)).orderBy(desc(announcements.createdAt)).limit(3),
-    db.select().from(events).where(and(eq(events.isPublic, true), gte(events.startsAt, new Date()))).orderBy(asc(events.startsAt)).limit(5),
-  ]);
-  return { news, upcoming };
-}
+import { dateParts } from "@/lib/format";
+import { getHomeContent, getLiveStatus } from "@/lib/public-data";
 
 const PHOTOS = [eglise.photos.louange, eglise.photos.jeunesse, eglise.photos.enfants, eglise.photos.priere, eglise.photos.assemblee];
 
-function dateParts(d: Date, lang: Locale) {
-  const f = new Intl.DateTimeFormat(lang === "fr" ? "fr-FR" : "en-US", { timeZone: "America/Indiana/Indianapolis", day: "2-digit", month: "short", weekday: "long", hour: "2-digit", minute: "2-digit", hour12: lang === "en" });
-  const p = Object.fromEntries(f.formatToParts(d).map((x) => [x.type, x.value]));
-  const time = lang === "fr" ? `${p.hour}h${p.minute}` : `${p.hour}:${p.minute} ${p.dayPeriod ?? ""}`.trim();
-  return { day: p.day, month: p.month.replace(".", ""), weekday: p.weekday, time };
+/** Données structurées (schema.org/Church) pour les moteurs de recherche. */
+function churchJsonLd(lang: Locale) {
+  const x = eglise.t(lang);
+  return {
+    "@context": "https://schema.org",
+    "@type": "Church",
+    name: eglise.nom,
+    alternateName: "Philadelphie SDA Church",
+    description: x.description,
+    url: `${eglise.siteUrl}/${lang}`,
+    email: eglise.email,
+    ...(eglise.telephone ? { telephone: eglise.telephone } : {}),
+    address: { "@type": "PostalAddress", streetAddress: "3642 North Emerson Avenue", addressLocality: "Indianapolis", addressRegion: "IN", postalCode: "46218", addressCountry: "US" },
+    hasMap: eglise.carte,
+    sameAs: [eglise.youtube, eglise.facebook].filter(Boolean),
+    openingHoursSpecification: [
+      { "@type": "OpeningHoursSpecification", dayOfWeek: "Saturday", opens: "09:30", closes: "14:00" },
+      { "@type": "OpeningHoursSpecification", dayOfWeek: "Wednesday", opens: "19:00", closes: "20:30" },
+    ],
+    event: eglise.creneaux.map((c) => ({ "@type": "Event", name: x.cultes[c.index].nom, description: x.cultes[c.index].detail, location: { "@type": "Place", name: eglise.nom, address: eglise.adresse }, eventSchedule: { "@type": "Schedule", byDay: `https://schema.org/${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][c.weekday]}`, startTime: `${String(c.hour).padStart(2, "0")}:${String(c.minute).padStart(2, "0")}`, repeatFrequency: "P1W" } })),
+  };
 }
 
 export default async function Home({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
-  const [t, { news, upcoming }] = await Promise.all([getDictionary(lang), getPublicContent()]);
+  const [t, { news, upcoming }, status] = await Promise.all([getDictionary(lang), getHomeContent(), getLiveStatus()]);
   const x = eglise.t(lang);
   const slots = eglise.creneaux.map((c) => ({ ...c, nom: x.cultes[c.index].nom, heure: x.cultes[c.index].heure }));
   const pick = (fr: string, en: string | null) => (lang === "en" && en ? en : fr);
 
   return (
     <>
-      <SiteHeader lang={lang} nav={t.nav} sousTitre={x.sousTitre} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(churchJsonLd(lang)) }} />
+      <SiteHeader lang={lang} nav={t.nav} sousTitre={x.sousTitre} live={status.live} />
       <main className="flex-1">
         {/* ---------- Héros : photo fondue à droite ---------- */}
         <section className="relative isolate overflow-hidden bg-bg">
@@ -76,9 +83,13 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                 {t.hero.cta}
                 <span className="grid h-10 w-10 place-items-center rounded-full bg-gold text-night transition group-hover:translate-x-0.5"><ArrowRight className="h-4 w-4" /></span>
               </a>
-              <a href={eglise.youtube} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-ink/80 hover:text-accent">
-                <PlayCircle className="h-6 w-6 text-accent" /> {t.hero.live}
-              </a>
+              {status.live ? (
+                <LiveBadge lang={lang} label={t.hero.liveNow} size="lg" />
+              ) : (
+                <Link href={`/${lang}/en-direct`} className="inline-flex items-center gap-2 text-sm font-semibold text-ink/80 hover:text-accent">
+                  <PlayCircle className="h-6 w-6 text-accent" /> {t.hero.live}
+                </Link>
+              )}
             </div>
 
             {/* Photo + compte à rebours (mobile / tablette) */}
@@ -147,9 +158,9 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                   <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{t.ministeres.eyebrow}</p>
                   <h2 className="mt-4 font-display text-4xl leading-tight font-semibold text-night sm:text-5xl">{t.ministeres.title}</h2>
                 </div>
-                <a href="#contact" className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline">
+                <Link href={`/${lang}/contact`} className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline">
                   {t.ministeres.serve} <ArrowUpRight className="h-4 w-4" />
-                </a>
+                </Link>
               </div>
             </Reveal>
             {/* Mobile : bande à faire défiler · Desktop : rangée de cinq */}
@@ -195,19 +206,26 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         <section id="message" className="bg-subtle">
           <div className="mx-auto grid max-w-7xl gap-10 px-5 py-24 sm:px-8 lg:grid-cols-2 lg:items-center">
             <Reveal>
-              <a href={eglise.youtube} target="_blank" rel="noreferrer" className="group relative block aspect-video overflow-hidden rounded-[2rem] bg-night shadow-2xl">
+              <Link href={`/${lang}/en-direct`} className="group relative block aspect-video overflow-hidden rounded-[2rem] bg-night shadow-2xl">
                 <Image src={eglise.photos.louange} alt="" fill sizes="(min-width:1024px) 45vw, 90vw" className="object-cover opacity-60 transition duration-700 group-hover:scale-105 group-hover:opacity-70" />
                 <span className="absolute inset-0 grid place-items-center">
                   <span className="grid h-20 w-20 place-items-center rounded-full bg-gold text-night shadow-xl transition group-hover:scale-110"><PlayCircle className="h-10 w-10" /></span>
                 </span>
-                <span className="absolute top-5 left-5 rounded-full bg-night/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white backdrop-blur">{t.messages.badge}</span>
-              </a>
+                {status.live ? (
+                  <span className="absolute top-5 left-5 inline-flex items-center gap-2 rounded-full bg-red-600 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white"><span className="h-2 w-2 animate-pulse rounded-full bg-white" /> {t.live.badge}</span>
+                ) : (
+                  <span className="absolute top-5 left-5 rounded-full bg-night/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white backdrop-blur">{t.messages.badge}</span>
+                )}
+              </Link>
             </Reveal>
             <Reveal delay={100}>
               <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{t.messages.eyebrow}</p>
               <h2 className="mt-4 font-display text-4xl leading-tight font-semibold text-balance text-night sm:text-5xl">{t.messages.title}</h2>
               <p className="mt-5 text-muted text-pretty">{t.messages.text}</p>
-              <a href={eglise.youtube} target="_blank" rel="noreferrer" className="mt-6 inline-flex items-center gap-2 font-semibold text-accent hover:underline">{t.messages.cta} <ArrowUpRight className="h-4 w-4" /></a>
+              <div className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
+                <Link href={`/${lang}/messages`} className="inline-flex items-center gap-2 font-semibold text-accent hover:underline">{t.sermons.eyebrow} <ArrowRight className="h-4 w-4" /></Link>
+                <a href={eglise.youtube} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 font-semibold text-accent hover:underline">{t.messages.cta} <ArrowUpRight className="h-4 w-4" /></a>
+              </div>
             </Reveal>
           </div>
         </section>
@@ -292,6 +310,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             <Reveal>
               <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{t.contact.eyebrow}</p>
               <h2 className="mt-4 font-display text-4xl font-semibold text-night sm:text-5xl">{t.contact.title}</h2>
+              <Link href={`/${lang}/contact`} className="mt-5 inline-flex items-center gap-2 font-semibold text-accent hover:underline">{t.contactPage.title} <ArrowRight className="h-4 w-4" /></Link>
               <dl className="mt-8 divide-y hairline">
                 <div className="py-4">
                   <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted">{t.contact.address}</dt>
@@ -318,7 +337,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           </div>
         </section>
       </main>
-      <SiteFooter lang={lang} t={{ ...t.footer, espace: t.nav.espace }} />
+      <SiteFooter lang={lang} t={{ ...t.footer, espace: t.nav.espace }} nav={t.nav} />
     </>
   );
 }

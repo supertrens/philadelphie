@@ -31,7 +31,7 @@ export default clerkMiddleware(async (auth, req) => {
 export const config = {
   matcher: [
     // Tout sauf les fichiers statiques et les internes Next.js
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|pdf|mp3)).*)",
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|pdf|mp3|xml|txt)).*)",
     "/(api|trpc)(.*)",
   ],
 };

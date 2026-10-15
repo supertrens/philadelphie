@@ -14,7 +14,11 @@
     "switch": "English",
     "switchAria": "Switch to English",
     "menuOpen": "Ouvrir le menu",
-    "menuClose": "Fermer le menu"
+    "menuClose": "Fermer le menu",
+    "direct": "En direct",
+    "bulletin": "Bulletin",
+    "priere": "Prière",
+    "liveNow": "En direct maintenant"
   },
   "hero": {
     "eyebrow": "Indianapolis · Francophone · Adventiste",
@@ -26,17 +30,33 @@
     "cta": "Venir ce Sabbat",
     "live": "Culte en direct",
     "discover": "Découvrir",
-    "photoAlt": "Assemblée pendant le culte"
+    "photoAlt": "Assemblée pendant le culte",
+    "liveNow": "Culte en direct maintenant"
   },
   "countdown": {
     "now": "En ce moment",
     "next": "Prochain rendez-vous",
-    "days": ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"],
+    "days": [
+      "dimanche",
+      "lundi",
+      "mardi",
+      "mercredi",
+      "jeudi",
+      "vendredi",
+      "samedi"
+    ],
     "d": "j",
     "h": "h",
     "min": "min"
   },
-  "marquee": ["Bienvenue", "Byenveni", "Welcome", "Bienvenido", "Karibu", "Shalom"],
+  "marquee": [
+    "Bienvenue",
+    "Byenveni",
+    "Welcome",
+    "Bienvenido",
+    "Karibu",
+    "Shalom"
+  ],
   "venir": {
     "eyebrow": "Venir",
     "title": "Votre premier Sabbat, en toute simplicité.",
@@ -47,14 +67,31 @@
     "title": "Chacun a sa place.",
     "serve": "Envie de servir ? Parlez-nous",
     "items": [
-      { "name": "Louange", "sub": "Chorale & musiciens" },
-      { "name": "Jeunesse", "sub": "JA · 13-30 ans" },
-      { "name": "Enfants", "sub": "École du Sabbat" },
-      { "name": "Prière", "sub": "Intercession & visites" },
-      { "name": "Communauté", "sub": "Accueil & repas" }
+      {
+        "name": "Louange",
+        "sub": "Chorale & musiciens"
+      },
+      {
+        "name": "Jeunesse",
+        "sub": "JA · 13-30 ans"
+      },
+      {
+        "name": "Enfants",
+        "sub": "École du Sabbat"
+      },
+      {
+        "name": "Prière",
+        "sub": "Intercession & visites"
+      },
+      {
+        "name": "Communauté",
+        "sub": "Accueil & repas"
+      }
     ]
   },
-  "mot": { "eyebrow": "Mot d’accueil" },
+  "mot": {
+    "eyebrow": "Mot d’accueil"
+  },
   "messages": {
     "eyebrow": "Messages",
     "badge": "Chaque Sabbat · 11h00",
@@ -90,5 +127,103 @@
     "rdv": "Rendez-vous",
     "find": "Nous trouver",
     "directions": "Itinéraire"
+  },
+  "common": {
+    "back": "Retour",
+    "home": "Accueil",
+    "share": "Partager",
+    "copied": "Lien copié !",
+    "listen": "Écouter l’audio",
+    "download": "Télécharger",
+    "watchYoutube": "Voir sur YouTube",
+    "readMore": "Lire la suite",
+    "sending": "Envoi…",
+    "required": "Champ obligatoire",
+    "errorGeneric": "Une erreur est survenue. Réessayez dans un instant.",
+    "all": "Tous"
+  },
+  "sermons": {
+    "eyebrow": "Messages",
+    "title": "Réécouter la Parole.",
+    "text": "Les messages du Sabbat, en vidéo ou en audio, pour les revoir, les méditer et les partager.",
+    "series": "Série",
+    "filterLabel": "Filtrer par série",
+    "empty": "Les premiers messages seront publiés ici très bientôt.",
+    "emptySeries": "Aucun message dans cette série.",
+    "speaker": "Prédicateur",
+    "scripture": "Texte biblique",
+    "date": "Date",
+    "audio": "Audio",
+    "video": "Vidéo",
+    "more": "Autres messages",
+    "moreInSeries": "Dans la même série",
+    "noVideo": "Ce message est disponible en audio.",
+    "metaDescription": "Messages et prédications de l’Église Adventiste Philadelphie, Indianapolis — vidéo et audio."
+  },
+  "live": {
+    "eyebrow": "Culte en direct",
+    "title": "Le culte, en direct de Philadelphie.",
+    "onTitle": "Nous sommes en direct !",
+    "text": "Chaque Sabbat à 11h00 (heure d’Indianapolis), le culte est diffusé en direct. Rejoignez-nous ici ou sur notre chaîne YouTube.",
+    "offText": "Aucune diffusion en cours. Le prochain direct commence ici, chaque Sabbat à 11h00.",
+    "badge": "En direct",
+    "offline": "Hors ligne",
+    "openYoutube": "Ouvrir sur YouTube",
+    "channel": "Notre chaîne YouTube",
+    "schedule": "Horaires de diffusion",
+    "lastMessages": "Derniers messages",
+    "metaDescription": "Suivez le culte de l’Église Adventiste Philadelphie en direct, chaque Sabbat à 11h00."
+  },
+  "prayer": {
+    "eyebrow": "Prière",
+    "title": "Confiez-nous votre fardeau.",
+    "text": "Notre équipe pastorale prie chaque semaine pour les demandes reçues. Votre demande peut rester confidentielle : elle ne sera alors lue que par le pastorat.",
+    "name": "Votre prénom (facultatif)",
+    "email": "Votre e-mail (facultatif)",
+    "message": "Votre demande de prière",
+    "confidential": "Demande confidentielle (lue uniquement par le pastorat)",
+    "submit": "Envoyer ma demande",
+    "thanksTitle": "Merci. Nous prions avec vous.",
+    "thanksText": "Votre demande a bien été reçue et sera portée dans la prière par l’équipe pastorale.",
+    "another": "Envoyer une autre demande",
+    "verse": "Déchargez-vous sur lui de tous vos soucis, car lui-même prend soin de vous.",
+    "verseRef": "1 Pierre 5:7",
+    "metaDescription": "Envoyez une demande de prière à l’Église Adventiste Philadelphie. L’équipe pastorale prie pour vous."
+  },
+  "contactPage": {
+    "eyebrow": "Contact",
+    "title": "Écrivez-nous.",
+    "text": "Une question, une visite, un projet ? Laissez-nous un message, nous vous répondrons rapidement.",
+    "name": "Votre nom",
+    "email": "Votre e-mail",
+    "phone": "Téléphone (facultatif)",
+    "subject": "Sujet",
+    "message": "Votre message",
+    "submit": "Envoyer le message",
+    "subjects": [
+      "Première visite",
+      "Étude biblique",
+      "Baptême",
+      "Demande de renseignements",
+      "Partenariat / Événement",
+      "Autre"
+    ],
+    "thanksTitle": "Message bien reçu.",
+    "thanksText": "Merci ! Nous vous répondrons dans les meilleurs délais.",
+    "another": "Envoyer un autre message",
+    "hours": "Nous sommes présents à l’église le Sabbat de 9h30 à 14h00 et le mercredi soir à 19h00.",
+    "metaDescription": "Contactez l’Église Adventiste Philadelphie à Indianapolis : adresse, e-mail et formulaire de contact."
+  },
+  "bulletin": {
+    "eyebrow": "Bulletin",
+    "title": "Le bulletin de la semaine.",
+    "text": "Programme du culte, annonces et rendez-vous de la semaine, en un seul document.",
+    "latest": "Dernier bulletin",
+    "weekOf": "Sabbat du",
+    "archive": "Archives",
+    "empty": "Le premier bulletin sera mis en ligne prochainement.",
+    "open": "Ouvrir le PDF",
+    "preview": "Aperçu du bulletin",
+    "metaDescription": "Bulletin hebdomadaire de l’Église Adventiste Philadelphie : programme du culte et annonces."
   }
 }

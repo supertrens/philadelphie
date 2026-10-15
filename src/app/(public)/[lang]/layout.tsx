@@ -15,10 +15,15 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
   if (!hasLocale(lang)) return {};
   const t = await getDictionary(lang);
   return {
+    metadataBase: new URL(eglise.siteUrl),
     title: { default: eglise.nom, template: `%s · ${eglise.nom}` },
     description: t.meta.description,
-    alternates: { languages: { fr: "/fr", en: "/en" } },
-    openGraph: { title: eglise.nom, description: t.meta.description, locale: lang === "fr" ? "fr_FR" : "en_US", type: "website" },
+    applicationName: eglise.nom,
+    alternates: { canonical: `/${lang}`, languages: { fr: "/fr", en: "/en" } },
+    // Sans titre ni description ici : chaque page fournit les siens (og:title suit le <title>)
+    openGraph: { siteName: eglise.nom, locale: lang === "fr" ? "fr_FR" : "en_US", alternateLocale: lang === "fr" ? "en_US" : "fr_FR", type: "website" },
+    twitter: { card: "summary_large_image" },
+    robots: { index: true, follow: true },
   };
 }
 

@@ -2,7 +2,7 @@
 
 import { eq } from "drizzle-orm";
 import { revalidatePath, updateTag } from "next/cache";
-import { announcements, db, members } from "@/db";
+import { announcements, contactMessages, db, members } from "@/db";
 import { logAction } from "@/lib/audit";
 import { requireRole } from "@/lib/auth";
 
@@ -70,5 +70,19 @@ export async function deleteAnnouncement(id: number) {
   await db.delete(announcements).where(eq(announcements.id, id));
   updateTag("public");
   await logAction(staff, "deleteAnnouncement", "secretariat");
+  revalidatePath(PATH);
+}
+
+export async function setContactStatus(id: number, status: "nouveau" | "traite") {
+  const staff = await requireRole("secretariat");
+  await db.update(contactMessages).set({ status }).where(eq(contactMessages.id, id));
+  await logAction(staff, status === "traite" ? "message traité" : "message rouvert", "contact", id);
+  revalidatePath(PATH);
+}
+
+export async function deleteContactMessage(id: number) {
+  const staff = await requireRole("secretariat");
+  await db.delete(contactMessages).where(eq(contactMessages.id, id));
+  await logAction(staff, "suppression", "contact", id);
   revalidatePath(PATH);
 }

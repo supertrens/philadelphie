@@ -3,7 +3,16 @@ import { eglise } from "@/config/eglise";
 import type { Locale } from "@/i18n/locales";
 import { Logo } from "./logo";
 
-export function SiteFooter({ lang, t }: { lang: Locale; t: { rdv: string; find: string; directions: string; espace: string } }) {
+type Nav = (typeof import("@/i18n/fr.json"))["nav"];
+
+export function SiteFooter({ lang, t, nav }: { lang: Locale; t: { rdv: string; find: string; directions: string; espace: string }; nav: Nav }) {
+  const pages = [
+    { href: `/${lang}/messages`, label: nav.messages },
+    { href: `/${lang}/en-direct`, label: nav.direct },
+    { href: `/${lang}/bulletin`, label: nav.bulletin },
+    { href: `/${lang}/priere`, label: nav.priere },
+    { href: `/${lang}/contact`, label: nav.contact },
+  ];
   const x = eglise.t(lang);
   return (
     <footer className="relative overflow-hidden bg-night text-white/70">
@@ -20,6 +29,9 @@ export function SiteFooter({ lang, t }: { lang: Locale; t: { rdv: string; find: 
             </span>
           </div>
           <p className="mt-5 max-w-md text-sm leading-relaxed text-pretty">{x.description}</p>
+          <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+            {pages.map((p) => <li key={p.href}><Link href={p.href} className="hover:text-white">{p.label}</Link></li>)}
+          </ul>
         </div>
         <div>
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold">{t.rdv}</h3>
