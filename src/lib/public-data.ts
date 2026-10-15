@@ -33,6 +33,19 @@ export async function getHomeContent() {
 /** Publications « Vie de l'église » : les plus récentes d'abord (date de publication, sinon de création). */
 const postOrder = desc(sql`coalesce(${posts.publishedAt}, ${posts.createdAt})`);
 
+/** Agenda de la page « Vie de l'église » : annonces, prochains rendez-vous et bulletins. */
+export async function getAgenda() {
+  "use cache";
+  cacheTag("public");
+  cacheLife("minutes");
+  const [news, upcoming, bulletinList] = await Promise.all([
+    db.select().from(announcements).where(eq(announcements.published, true)).orderBy(desc(announcements.createdAt)).limit(10),
+    db.select().from(events).where(and(eq(events.isPublic, true), gte(events.startsAt, new Date()))).orderBy(asc(events.startsAt)).limit(12),
+    db.select().from(bulletins).orderBy(desc(bulletins.weekOf)).limit(6),
+  ]);
+  return { news, upcoming, bulletins: bulletinList };
+}
+
 export async function getPosts() {
   "use cache";
   cacheTag("public");

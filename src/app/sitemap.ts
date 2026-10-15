@@ -8,7 +8,6 @@ const PAGES: { path: string; priority: number; changeFrequency: "daily" | "weekl
   { path: "/messages", priority: 0.8, changeFrequency: "weekly" },
   { path: "/vie", priority: 0.8, changeFrequency: "weekly" },
   { path: "/en-direct", priority: 0.8, changeFrequency: "weekly" },
-  { path: "/bulletin", priority: 0.7, changeFrequency: "weekly" },
   { path: "/priere", priority: 0.6, changeFrequency: "monthly" },
   { path: "/contact", priority: 0.6, changeFrequency: "monthly" },
 ];

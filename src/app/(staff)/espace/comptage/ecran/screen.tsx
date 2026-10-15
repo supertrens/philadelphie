@@ -6,9 +6,9 @@ import { Logo } from "@/components/logo";
 import { CATEGORIES, CATEGORY_LABELS, type LiveScreenData } from "@/lib/sabbath";
 
 const REFRESH_MS = 5000;
-/** Durée de l'écran des compteurs, puis de chaque nom (visiteur ou anniversaire). */
-const COUNTS_MS = 10000;
-const NAME_MS = 7000;
+/** Durée de l'écran des compteurs, puis de chaque nom (visiteur ou anniversaire) : lent, pour ne pas distraire. */
+const COUNTS_MS = 30000;
+const NAME_MS = 15000;
 
 type Step = { kind: "counts" } | { kind: "visitor"; id: number } | { kind: "birthday"; key: string };
 
@@ -85,7 +85,7 @@ export function Screen({ initial, title, dateLabel }: { initial: LiveScreenData;
   const stepKey = visitor ? `visitor-${visitor.id}` : birthday ? `birthday-${step.kind === "birthday" ? step.key : ""}` : "counts";
 
   return (
-    <div className={`bg-grain fixed inset-0 flex flex-col overflow-hidden transition-colors duration-700 ${golden ? "bg-gold text-night" : "bg-night text-white"}`}>
+    <div className={`bg-grain fixed inset-0 flex flex-col overflow-hidden transition-colors duration-[1500ms] ${golden ? "bg-gold text-night" : "bg-night text-white"}`}>
       {/* Lueurs qui dérivent lentement */}
       <div aria-hidden="true" className={`drift pointer-events-none absolute -top-[20vh] -left-[10vw] h-[70vh] w-[70vh] rounded-full blur-3xl ${golden ? "bg-white/40" : "bg-accent/40"}`} />
       <div aria-hidden="true" className={`drift-slow pointer-events-none absolute -right-[10vw] -bottom-[25vh] h-[80vh] w-[80vh] rounded-full blur-3xl ${golden ? "bg-night/10" : "bg-gold/15"}`} />

@@ -233,7 +233,7 @@
   "vie": {
     "eyebrow": "Church life",
     "title": "What we live together.",
-    "text": "News from our departments: outings, projects, moments of praise and fellowship, told by the people who live them.",
+    "text": "Gatherings, announcements, this week’s bulletin and news from our departments, all in one place.",
     "homeTitle": "Church life",
     "homeText": "The latest news from our departments.",
     "all": "See all",
@@ -244,7 +244,14 @@
     "more": "More news",
     "publishedOn": "Published on",
     "by": "By",
-    "metaDescription": "Life at Philadelphie Seventh-day Adventist Church in Indianapolis: department news, outings, projects and shared moments."
+    "metaDescription": "Life at Philadelphie Seventh-day Adventist Church in Indianapolis: gatherings, announcements, the weekly bulletin and department news.",
+    "events": "Coming up",
+    "noEvents": "Upcoming gatherings will be announced here.",
+    "notes": "Worth noting",
+    "bulletinTitle": "This week’s bulletin",
+    "bulletinEmpty": "The next bulletin will be posted here.",
+    "previous": "Previous bulletins",
+    "news": "News from our departments"
   },
   "departments": {
     "secretariat": "Secretariat",

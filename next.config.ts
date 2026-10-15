@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
     localPatterns: [{ pathname: "/api/fichier" }, { pathname: "/**", search: "" }],
   },
   partialPrefetching: true,
+  // L'ancienne page Bulletin vit désormais dans « Vie de l'église »
+  async redirects() {
+    return [{ source: "/:lang(fr|en)/bulletin", destination: "/:lang/vie", permanent: true }];
+  },
   turbopack: {
     rules: {
       "*.css": {

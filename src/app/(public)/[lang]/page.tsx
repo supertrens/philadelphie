@@ -231,54 +231,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           </div>
         </section>
 
-        {/* ---------- Agenda ---------- */}
-        <section id="agenda" className="mx-auto max-w-7xl px-5 py-24 sm:px-8">
-          <div className="grid gap-12 lg:grid-cols-[1fr_1fr]">
-            <Reveal>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{t.agenda.eyebrow}</p>
-              <h2 className="mt-4 font-display text-4xl font-semibold text-night sm:text-5xl">{t.agenda.title}</h2>
-              {upcoming.length === 0 ? (
-                <p className="mt-8 border-t hairline pt-6 text-muted">{t.agenda.empty}</p>
-              ) : (
-                <ul className="mt-8">
-                  {upcoming.map((e) => {
-                    const d = dateParts(e.startsAt, lang);
-                    return (
-                      <li key={e.id} className="grid grid-cols-[4.5rem_1fr] gap-5 border-t hairline py-5">
-                        <span className="text-center">
-                          <span className="block font-display text-4xl leading-none font-semibold text-accent">{d.day}</span>
-                          <span className="block text-xs font-semibold uppercase tracking-wider text-muted">{d.month}</span>
-                        </span>
-                        <span>
-                          <span className="block font-display text-xl font-semibold">{pick(e.title, e.titleEn)}</span>
-                          <span className="block text-sm text-muted capitalize">{d.weekday} · {d.time}{e.location ? ` · ${e.location}` : ""}</span>
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </Reveal>
-            <Reveal delay={100}>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{t.agenda.newsEyebrow}</p>
-              <h2 className="mt-4 font-display text-4xl font-semibold text-night sm:text-5xl">{t.agenda.newsTitle}</h2>
-              {news.length === 0 ? (
-                <p className="mt-8 border-t hairline pt-6 text-muted">{t.agenda.newsEmpty}</p>
-              ) : (
-                <ul className="mt-8 space-y-4">
-                  {news.map((a) => (
-                    <li key={a.id} className="rounded-3xl border-l-4 border-gold bg-surface p-6 shadow-sm">
-                      <p className="font-display text-xl font-semibold text-night">{pick(a.title, a.titleEn)}</p>
-                      <p className="mt-2 text-sm whitespace-pre-line text-muted">{pick(a.body, a.bodyEn)}</p>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Reveal>
-          </div>
-        </section>
-
-        {/* ---------- Vie de l'église : publications des départements ---------- */}
+        {/* ---------- Vie de l'église : rendez-vous, annonces et nouvelles des départements ---------- */}
         <section id="vie" className="bg-subtle py-24">
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
             <Reveal>
@@ -293,6 +246,49 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                 </Link>
               </div>
             </Reveal>
+            {(upcoming.length > 0 || news.length > 0) && (
+              <div className="mt-12 grid gap-10 lg:grid-cols-2">
+                <Reveal>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted">{t.vie.events}</p>
+                  {upcoming.length === 0 ? (
+                    <p className="mt-4 border-t hairline pt-5 text-sm text-muted">{t.vie.noEvents}</p>
+                  ) : (
+                    <ul className="mt-4">
+                      {upcoming.slice(0, 3).map((e) => {
+                        const d = dateParts(e.startsAt, lang);
+                        return (
+                          <li key={e.id} className="grid grid-cols-[4rem_1fr] gap-4 border-t hairline py-4">
+                            <span className="text-center">
+                              <span className="block font-display text-3xl leading-none font-semibold text-accent">{d.day}</span>
+                              <span className="block text-xs font-semibold uppercase tracking-wider text-muted">{d.month}</span>
+                            </span>
+                            <span>
+                              <span className="block font-display text-lg font-semibold">{pick(e.title, e.titleEn)}</span>
+                              <span className="block text-sm text-muted capitalize">{d.weekday} · {d.time}{e.location ? ` · ${e.location}` : ""}</span>
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </Reveal>
+                <Reveal delay={100}>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted">{t.vie.notes}</p>
+                  {news.length === 0 ? (
+                    <p className="mt-4 border-t hairline pt-5 text-sm text-muted">{t.agenda.newsEmpty}</p>
+                  ) : (
+                    <ul className="mt-4 space-y-3">
+                      {news.map((a) => (
+                        <li key={a.id} className="rounded-2xl border-l-4 border-gold bg-surface p-5 shadow-sm">
+                          <p className="font-display text-lg font-semibold text-night">{pick(a.title, a.titleEn)}</p>
+                          <p className="mt-1 text-sm whitespace-pre-line text-muted">{pick(a.body, a.bodyEn)}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </Reveal>
+              </div>
+            )}
             {vie.length === 0 ? (
               <Reveal><p className="mt-10 rounded-3xl border border-dashed border-line px-6 py-14 text-center text-muted">{t.vie.empty}</p></Reveal>
             ) : (

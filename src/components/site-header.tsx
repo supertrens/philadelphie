@@ -19,9 +19,7 @@ function navLinks(lang: Locale, nav: Nav, live: boolean) {
     { href: `/${lang}/messages`, label: nav.messages },
     { href: `/${lang}/vie`, label: nav.vie },
     { href: `/${lang}/en-direct`, label: nav.direct, live },
-    { href: `/${lang}/bulletin`, label: nav.bulletin },
     { href: `/${lang}/priere`, label: nav.priere },
-    { href: `/${lang}#agenda`, label: nav.agenda },
     { href: `/${lang}/contact`, label: nav.contact },
   ];
 }

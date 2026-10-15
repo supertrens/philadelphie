@@ -233,7 +233,7 @@
   "vie": {
     "eyebrow": "Vie de l’église",
     "title": "Ce que nous vivons ensemble.",
-    "text": "Les nouvelles des départements : sorties, projets, moments de louange et de partage, racontés par ceux qui les vivent.",
+    "text": "Les rendez-vous, les annonces, le bulletin de la semaine et les nouvelles des départements, au même endroit.",
     "homeTitle": "Vie de l’église",
     "homeText": "Les dernières nouvelles de nos départements.",
     "all": "Tout voir",
@@ -244,7 +244,14 @@
     "more": "Autres nouvelles",
     "publishedOn": "Publié le",
     "by": "Par",
-    "metaDescription": "La vie de l’Église Adventiste Philadelphie à Indianapolis : nouvelles des départements, sorties, projets et moments partagés."
+    "metaDescription": "La vie de l’Église Adventiste Philadelphie à Indianapolis : rendez-vous, annonces, bulletin de la semaine et nouvelles des départements.",
+    "events": "Prochains rendez-vous",
+    "noEvents": "Les prochains rendez-vous seront annoncés ici.",
+    "notes": "À noter",
+    "bulletinTitle": "Bulletin de la semaine",
+    "bulletinEmpty": "Le prochain bulletin sera mis en ligne ici.",
+    "previous": "Bulletins précédents",
+    "news": "Nouvelles des départements"
   },
   "departments": {
     "secretariat": "Secrétariat",
