@@ -75,7 +75,8 @@ function Brand({ lang, sousTitre, onClick }: { lang: Locale; sousTitre: string; 
       <Logo size={34} />
       <span className="leading-none">
         <span className="block font-display-italic text-2xl">Philadelphie</span>
-        <span className="mt-1 hidden text-[10px] font-semibold uppercase tracking-[0.22em] text-muted sm:block">{sousTitre}</span>
+        {/* Sous-titre sur une seule ligne, tablette seulement : sur bureau la barre complète prend la place */}
+        <span className="mt-1 hidden whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.22em] text-muted sm:block xl:hidden">{sousTitre}</span>
       </span>
     </Link>
   );
@@ -111,7 +112,7 @@ export function SiteHeader({ lang, nav, sousTitre, live = false }: { lang: Local
       <nav className={`mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 transition-[padding] duration-300 sm:px-8 ${scrolled ? "py-3" : "py-5"}`}>
         <Brand lang={lang} sousTitre={sousTitre} onClick={close} />
         {/* Neuf liens : la barre complète n'apparaît qu'à partir de 1280 px, le menu plein écran sert en dessous */}
-        <div className="hidden items-center gap-5 text-[12px] font-semibold uppercase tracking-[0.14em] text-night xl:flex 2xl:gap-7 2xl:text-[13px]">
+        <div className="hidden items-center gap-5 text-[12px] font-semibold uppercase tracking-[0.14em] text-night xl:flex">
           <Suspense fallback={<NavLinks lang={lang} nav={nav} live={live} pathname={null} />}>
             <NavLinksLive lang={lang} nav={nav} live={live} />
           </Suspense>

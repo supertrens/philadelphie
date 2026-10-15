@@ -13,3 +13,10 @@ export function parseLocalDateTime(value: string): Date | null {
   const localAsUtc = Date.UTC(+parts.year, +parts.month - 1, +parts.day, +parts.hour, +parts.minute);
   return new Date(asUtc.getTime() - (localAsUtc - asUtc.getTime()));
 }
+
+/** Valeur d'un champ `type="date"` (AAAA-MM-JJ, heure d'Indianapolis) à partir d'une Date stockée. */
+export function toDateInput(d: Date | null | undefined) {
+  if (!d) return "";
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(d).map((x) => [x.type, x.value]));
+  return `${p.year}-${p.month}-${p.day}`;
+}

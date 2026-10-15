@@ -55,8 +55,8 @@ export const eglise = {
   // Chaîne YouTube de l'église (culte en direct et messages) — à confirmer
   youtube: "https://www.youtube.com/@philadelphiesdachurch",
   facebook: "",
-  // Dons en ligne via AdventistGiving — remplacer par le lien direct de l'église
-  don: "https://adventistgiving.org",
+  // Dons en ligne : page AdventistGiving de l'église
+  don: "https://adventistgiving.org/donate/ANF82G",
   // Créneaux (heure d'Indianapolis) : 0 = dimanche … 6 = samedi ; index = ligne de `cultes`
   creneaux: [
     { weekday: 6, hour: 9, minute: 30, index: 0 },

@@ -10,11 +10,12 @@ const CYCLE_MS = 10000;
 /** Noms de visiteurs par page de bienvenue. */
 const PER_PAGE = 8;
 
-type View = "counts" | "visitors";
+type View = "counts" | "visitors" | "birthdays";
 
 /**
  * Écran plein format pour une télévision : chiffres en direct, puis toutes les
- * 10 secondes la liste des visiteurs inscrits par le secrétariat (bienvenue).
+ * 10 secondes la liste des visiteurs inscrits par le secrétariat (bienvenue),
+ * puis les anniversaires de la semaine.
  */
 export function Screen({ initial, title, dateLabel }: { initial: LiveScreenData; title: string; dateLabel: string }) {
   const [data, setData] = useState(initial);
@@ -24,9 +25,11 @@ export function Screen({ initial, title, dateLabel }: { initial: LiveScreenData;
   const [clock, setClock] = useState("");
   // Nombre de visiteurs lu par le minuteur d'alternance (sans relancer l'intervalle)
   const visitorsRef = useRef(initial.visitors.length);
+  const birthdaysRef = useRef(initial.birthdays.length);
   useEffect(() => {
     visitorsRef.current = data.visitors.length;
-  }, [data.visitors.length]);
+    birthdaysRef.current = data.birthdays.length;
+  }, [data.visitors.length, data.birthdays.length]);
 
   // Rafraîchissement des données toutes les 5 s
   useEffect(() => {
@@ -51,17 +54,15 @@ export function Screen({ initial, title, dateLabel }: { initial: LiveScreenData;
     };
   }, []);
 
-  // Alternance compteurs → visiteurs (page suivante à chaque passage) → compteurs…
+  // Alternance compteurs → visiteurs (page suivante à chaque passage) → anniversaires → compteurs…
   useEffect(() => {
     const id = setInterval(() => {
       const pages = Math.max(1, Math.ceil(visitorsRef.current / PER_PAGE));
       setView((v) => {
-        if (visitorsRef.current === 0) return "counts";
-        if (v === "counts") {
-          setPage((p) => (p + 1) % pages);
-          return "visitors";
-        }
-        return "counts";
+        const order: View[] = ["counts", ...(visitorsRef.current > 0 ? (["visitors"] as View[]) : []), ...(birthdaysRef.current > 0 ? (["birthdays"] as View[]) : [])];
+        const next = order[(Math.max(0, order.indexOf(v)) + 1) % order.length];
+        if (next === "visitors") setPage((p) => (p + 1) % pages);
+        return next;
       });
     }, CYCLE_MS);
     return () => clearInterval(id);
@@ -78,6 +79,8 @@ export function Screen({ initial, title, dateLabel }: { initial: LiveScreenData;
 
   const total = data.adultes + data.enfants + data.visiteurs;
   const showVisitors = view === "visitors" && data.visitors.length > 0;
+  const showBirthdays = view === "birthdays" && data.birthdays.length > 0;
+  const rotating = data.visitors.length > 0 || data.birthdays.length > 0;
   const pages = Math.max(1, Math.ceil(data.visitors.length / PER_PAGE));
   const slice = data.visitors.slice((page % pages) * PER_PAGE, (page % pages) * PER_PAGE + PER_PAGE);
 
@@ -120,6 +123,21 @@ export function Screen({ initial, title, dateLabel }: { initial: LiveScreenData;
           </ul>
           {pages > 1 && <p className="mt-[3vh] text-[clamp(0.6rem,1vw,1rem)] font-semibold uppercase tracking-[0.3em] text-white/50">{(page % pages) + 1} / {pages}</p>}
         </main>
+      ) : showBirthdays ? (
+        <main key="birthdays" className="screen-in relative flex flex-1 flex-col items-center justify-center px-[4vw] text-center">
+          <p className="text-[clamp(0.8rem,1.6vw,1.6rem)] font-semibold uppercase tracking-[0.35em] text-white/70">Cette semaine, nous fêtons</p>
+          <p className="mt-[1vh] font-display text-[clamp(3rem,11vh,8rem)] leading-none font-semibold text-gold">
+            Joyeux anniversaire<span className="font-display-italic font-normal text-white"> !</span>
+          </p>
+          <ul className={`mt-[4vh] grid w-full max-w-[90vw] gap-x-[4vw] gap-y-[1.5vh] ${data.birthdays.length > 4 ? "grid-cols-2" : "grid-cols-1"}`}>
+            {data.birthdays.slice(0, PER_PAGE).map((b, i) => (
+              <li key={`${b.name}-${b.monthDay}`} className="screen-in" style={{ animationDelay: `${120 + i * 110}ms` }}>
+                <p className={`font-display leading-tight font-semibold ${data.birthdays.length > 4 ? "text-[clamp(2rem,6.5vh,5rem)]" : "text-[clamp(2.5rem,9vh,7rem)]"}`}>{b.name}</p>
+                <p className="font-display-italic text-[clamp(1rem,2.6vh,2rem)] text-gold">{b.label}</p>
+              </li>
+            ))}
+          </ul>
+        </main>
       ) : (
         <main key="counts" className="screen-in relative flex flex-1 flex-col items-center justify-center px-[4vw] text-center">
           <p className="text-[clamp(0.8rem,1.6vw,1.6rem)] font-semibold uppercase tracking-[0.35em] text-white/70">Avec nous ce Sabbat</p>
@@ -137,8 +155,8 @@ export function Screen({ initial, title, dateLabel }: { initial: LiveScreenData;
             </div>
           ))}
         </div>
-        {/* Barre de progression du cycle (compteurs ⇄ visiteurs) */}
-        {data.visitors.length > 0 && (
+        {/* Barre de progression du cycle (compteurs → visiteurs → anniversaires) */}
+        {rotating && (
           <div className="mt-[2vh] h-1 overflow-hidden rounded-full bg-white/10">
             <div key={`${view}-${page}`} className="cycle-bar h-full bg-gold/80" style={{ "--cycle": `${CYCLE_MS}ms` } as React.CSSProperties} />
           </div>

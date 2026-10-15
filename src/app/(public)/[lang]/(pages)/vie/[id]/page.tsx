@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { PostCard, excerpt, postText } from "@/components/post-card";
 import { Reveal } from "@/components/reveal";
 import { ShareButton } from "@/components/share-button";
+import { WhatsAppShare } from "@/components/whatsapp-share";
 import { eglise } from "@/config/eglise";
 import { type Dictionary, getDictionary } from "@/i18n/dictionaries";
 import { hasLocale } from "@/i18n/locales";
@@ -97,6 +98,7 @@ async function Post({ params }: { params: Params }) {
           <div className="mt-10 max-w-3xl font-display text-xl leading-relaxed whitespace-pre-line text-ink sm:text-2xl">{body}</div>
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <ShareButton title={title} label={t.common.share} copied={t.common.copied} />
+            <WhatsAppShare text={title} url={`${eglise.siteUrl}/${lang}/vie/${post.id}`} label={t.common.whatsapp} />
           </div>
         </Reveal>
       </div>

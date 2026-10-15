@@ -30,7 +30,7 @@ export async function addTeacher(classId: number, formData: FormData) {
   const staff = await requireRole("enfants");
   const name = text(formData, "name");
   if (!name) return;
-  await db.insert(teachers).values({ classId, name, phone: text(formData, "phone") || null });
+  await db.insert(teachers).values({ classId, name, phone: text(formData, "phone") || null, birthday: text(formData, "birthday") || null });
   await logAction(staff, "ajout", "moniteur");
   revalidatePath(PATH);
 }

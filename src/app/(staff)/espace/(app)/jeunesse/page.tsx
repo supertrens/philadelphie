@@ -5,6 +5,7 @@ import { attendance, db, events, members } from "@/db";
 import { Button, Card, Empty, Field, Input, PageHeader, Stat, Textarea, formatDateTime } from "@/components/ui";
 import { PostsCard } from "@/components/posts-card";
 import { requireRole } from "@/lib/auth";
+import { birthdayLabel, monthDayOf } from "@/lib/birthdays";
 import { addEvent, addYouth, deleteEvent, saveAttendance } from "./actions";
 
 export const metadata: Metadata = { title: "Jeunesse" };
@@ -69,10 +70,11 @@ async function Content() {
       </Card>
 
       <Card title="Jeunes">
-        <form action={addYouth} className="mb-5 grid gap-3 rounded-xl bg-subtle p-4 sm:grid-cols-4 sm:items-end">
+        <form action={addYouth} className="mb-5 grid gap-3 rounded-xl bg-subtle p-4 sm:grid-cols-5 sm:items-end">
           <Field label="Prénom"><Input name="firstName" required /></Field>
           <Field label="Nom"><Input name="lastName" required /></Field>
           <Field label="Téléphone"><Input name="phone" type="tel" /></Field>
+          <Field label="Anniversaire (facultatif)"><Input name="birthday" type="date" /></Field>
           <Button type="submit">Ajouter</Button>
         </form>
         {youth.length === 0 ? <Empty>Aucun jeune inscrit.</Empty> : (
@@ -80,7 +82,7 @@ async function Content() {
             {youth.map((m) => (
               <li key={m.id} className="flex justify-between rounded-lg border border-line px-3 py-2 text-sm">
                 <span className="font-medium">{m.firstName} {m.lastName}</span>
-                <span className="text-muted">{m.phone}</span>
+                <span className="text-muted">{[m.phone, m.birthday ? `🎂 ${birthdayLabel(monthDayOf(m.birthday)!)}` : null].filter(Boolean).join(" · ")}</span>
               </li>
             ))}
           </ul>

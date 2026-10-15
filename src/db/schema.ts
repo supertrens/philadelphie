@@ -94,6 +94,7 @@ export const teachers = pgTable("teachers", {
   classId: integer("class_id").notNull().references(() => classes.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   phone: text("phone"),
+  birthday: date("birthday", { mode: "string" }),
 });
 
 export const classSessions = pgTable("class_sessions", {
@@ -269,6 +270,7 @@ export const sabbathVisitors = pgTable("sabbath_visitors", {
   name: text("name").notNull(),
   // Ville, pays ou église d'origine (facultatif)
   origin: text("origin"),
+  birthday: date("birthday", { mode: "string" }),
   createdBy: text("created_by"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

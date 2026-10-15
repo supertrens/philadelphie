@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { Reveal } from "@/components/reveal";
 import { SermonCard } from "@/components/sermon-card";
 import { ShareButton } from "@/components/share-button";
+import { WhatsAppShare } from "@/components/whatsapp-share";
 import { eglise } from "@/config/eglise";
 import { getDictionary } from "@/i18n/dictionaries";
 import { hasLocale } from "@/i18n/locales";
@@ -117,6 +118,7 @@ async function Sermon({ params }: { params: Params }) {
           </dl>
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <ShareButton title={sermon.title} label={t.common.share} copied={t.common.copied} />
+            <WhatsAppShare text={sermon.title} url={`${eglise.siteUrl}/${lang}/messages/${sermon.id}`} label={t.common.whatsapp} />
             {audio && (
               <a href={audio} download className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white transition hover:bg-accent-strong">
                 <Download className="h-4 w-4" /> {t.common.listen}

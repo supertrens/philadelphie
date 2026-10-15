@@ -27,6 +27,20 @@ export type Category = (typeof CATEGORIES)[number];
 export const CATEGORY_LABELS: Record<Category, string> = { adultes: "Adultes", enfants: "Enfants", visiteurs: "Visiteurs" };
 
 export type LiveCounts = { date: string; adultes: number; enfants: number; visiteurs: number; total: number; updatedAt: string | null };
-export type Visitor = { id: number; name: string; origin: string | null };
+export type Visitor = { id: number; name: string; origin: string | null; birthday?: string | null };
 /** Données de l'écran : compteurs + visiteurs inscrits par le secrétariat. */
-export type LiveScreenData = LiveCounts & { visitors: Visitor[] };
+export type LiveScreenData = LiveCounts & { visitors: Visitor[]; birthdays: BirthdayPerson[] };
+
+/** Date du jour (AAAA-MM-JJ) en heure d'Indianapolis. */
+export function todayDate(now = new Date()) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(now).map((x) => [x.type, x.value]));
+  return `${p.year}-${p.month}-${p.day}`;
+}
+
+/** Ajoute des jours à une date AAAA-MM-JJ. */
+export function addDays(date: string, days: number) {
+  const [y, m, d] = date.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
+}
+
+export type BirthdayPerson = { name: string; label: string; monthDay: string; role: string };

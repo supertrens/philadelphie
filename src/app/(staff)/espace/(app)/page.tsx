@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { BirthdaysCard } from "@/components/birthdays-card";
 import { Card, Empty, PageHeader, Stat, formatDate } from "@/components/ui";
 import { auditLog, contactMessages, db, events, members, prayerRequests, services } from "@/db";
 import { can, requireStaff } from "@/lib/auth";
@@ -68,6 +69,8 @@ async function Content() {
         </ul>
         <p className="mt-4 text-xs text-muted">{evenements} événement{evenements > 1 ? "s" : ""} public{evenements > 1 ? "s" : ""} à venir sur le site.</p>
       </Card>
+
+      <BirthdaysCard />
 
       {can(staff, "admin") && (
         <Card title="Dernières actions">

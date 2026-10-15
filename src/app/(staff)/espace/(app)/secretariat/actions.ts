@@ -5,6 +5,7 @@ import { revalidatePath, updateTag } from "next/cache";
 import { announcements, contactMessages, db, members, sabbathVisitors } from "@/db";
 import { logAction } from "@/lib/audit";
 import { requireRole } from "@/lib/auth";
+import { parseLocalDateTime } from "@/lib/dates";
 import { sabbathDate } from "@/lib/sabbath";
 
 const PATH = "/espace/secretariat";
@@ -18,6 +19,7 @@ function memberFields(f: FormData) {
     phone: optional(f, "phone"),
     email: optional(f, "email"),
     department: optional(f, "department"),
+    birthday: parseLocalDateTime(text(f, "birthday")),
     notes: optional(f, "notes"),
   };
 }
@@ -93,7 +95,7 @@ export async function addVisitor(formData: FormData) {
   const staff = await requireRole("secretariat");
   const name = text(formData, "name");
   if (!name) return;
-  await db.insert(sabbathVisitors).values({ date: sabbathDate(), name, origin: optional(formData, "origin"), createdBy: staff.name });
+  await db.insert(sabbathVisitors).values({ date: sabbathDate(), name, origin: optional(formData, "origin"), birthday: optional(formData, "birthday"), createdBy: staff.name });
   await logAction(staff, "ajout", "visiteur");
   revalidatePath(PATH);
   revalidatePath("/espace/comptage");

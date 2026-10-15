@@ -1,6 +1,7 @@
 import "server-only";
 import { asc, desc, eq } from "drizzle-orm";
 import { attendanceLive, db, sabbathVisitors, servicesAttendance } from "@/db";
+import { getBirthdaysOfWeek } from "./birthdays";
 import { CATEGORIES, type LiveCounts, type LiveScreenData, type Visitor, sabbathDate } from "./sabbath";
 
 /** Compteurs en direct du Sabbat (lecture directe, jamais mise en cache). */
@@ -40,6 +41,6 @@ export async function getVisitors(date = sabbathDate()): Promise<Visitor[]> {
 
 /** Compteurs + visiteurs : ce que l'écran et /api/comptage renvoient. */
 export async function getScreenData(date = sabbathDate()): Promise<LiveScreenData> {
-  const [counts, visitors] = await Promise.all([getLiveCounts(date), getVisitors(date)]);
-  return { ...counts, visitors };
+  const [counts, visitors, birthdays] = await Promise.all([getLiveCounts(date), getVisitors(date), getBirthdaysOfWeek(date)]);
+  return { ...counts, visitors, birthdays };
 }

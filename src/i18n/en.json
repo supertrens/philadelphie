@@ -141,7 +141,8 @@
     "sending": "Sending…",
     "required": "Required field",
     "errorGeneric": "Something went wrong. Please try again in a moment.",
-    "all": "All"
+    "all": "All",
+    "whatsapp": "Share on WhatsApp"
   },
   "sermons": {
     "eyebrow": "Sermons",

@@ -5,6 +5,7 @@ import { Button, Card, Empty, Field, Input, PageHeader, Stat, formatDate } from 
 import { classSessions, classes, db, teachers } from "@/db";
 import { PostsCard } from "@/components/posts-card";
 import { requireRole } from "@/lib/auth";
+import { birthdayLabel } from "@/lib/birthdays";
 import { addClass, addSession, addTeacher, deleteClass, deleteSession, deleteTeacher } from "./actions";
 
 export const metadata: Metadata = { title: "Enfants & École du Sabbat" };
@@ -64,14 +65,15 @@ async function Content() {
                   <ul className="text-sm">
                     {team.map((t) => (
                       <li key={t.id} className="flex items-center justify-between py-0.5">
-                        <span>{t.name}{t.phone && <span className="text-muted"> · {t.phone}</span>}</span>
+                        <span>{t.name}{t.phone && <span className="text-muted"> · {t.phone}</span>}{t.birthday && <span className="text-muted"> · 🎂 {birthdayLabel(t.birthday.slice(5))}</span>}</span>
                         <form action={deleteTeacher.bind(null, t.id)}><button className="px-1 text-muted hover:text-red-600" aria-label={`Retirer ${t.name}`}>×</button></form>
                       </li>
                     ))}
                   </ul>
-                  <form action={addTeacher.bind(null, c.id)} className="mt-2 flex gap-2">
-                    <Input name="name" required placeholder="Nom du moniteur" aria-label="Nom" />
+                  <form action={addTeacher.bind(null, c.id)} className="mt-2 flex flex-wrap gap-2">
+                    <Input name="name" required placeholder="Nom du moniteur" aria-label="Nom" className="min-w-40 flex-1" />
                     <Input name="phone" placeholder="Téléphone" aria-label="Téléphone" className="w-36 shrink-0" />
+                    <Input name="birthday" type="date" aria-label="Date de naissance (facultatif)" title="Date de naissance (facultatif)" className="w-40 shrink-0" />
                     <Button type="submit" variant="ghost" aria-label="Ajouter le moniteur">+</Button>
                   </form>
 

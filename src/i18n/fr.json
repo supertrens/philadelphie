@@ -141,7 +141,8 @@
     "sending": "Envoi…",
     "required": "Champ obligatoire",
     "errorGeneric": "Une erreur est survenue. Réessayez dans un instant.",
-    "all": "Tous"
+    "all": "Tous",
+    "whatsapp": "Partager sur WhatsApp"
   },
   "sermons": {
     "eyebrow": "Messages",

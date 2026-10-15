@@ -5,7 +5,9 @@ import { Button, Card, Empty, Field, Input, Textarea, formatDate } from "@/compo
 import { type DeptSlug, deptName } from "@/lib/departments";
 import { createPost, deletePost, togglePost } from "@/lib/posts/actions";
 import { fileUrl } from "@/lib/public-data";
+import { eglise } from "@/config/eglise";
 import { FileUpload } from "./file-upload";
+import { WhatsAppShare } from "./whatsapp-share";
 
 /**
  * Carte « Publier sur le site » : formulaire de publication et liste des
@@ -66,7 +68,7 @@ export async function PostsCard({ dept }: { dept?: DeptSlug }) {
                 <p className="mt-1 line-clamp-2 text-sm whitespace-pre-line text-muted">{p.body}</p>
                 <p className="mt-1 text-xs text-muted">
                   {formatDate(p.createdAt)} · {p.createdBy}{p.titleEn ? " · EN" : ""}
-                  {p.published && <> · <a href={`/fr/vie/${p.id}`} target="_blank" rel="noreferrer" className="text-accent hover:underline">Voir</a></>}
+                  {p.published && <> · <a href={`/fr/vie/${p.id}`} target="_blank" rel="noreferrer" className="text-accent hover:underline">Voir</a> · <WhatsAppShare compact text={p.title} url={`${eglise.siteUrl}/fr/vie/${p.id}`} label="WhatsApp" /></>}
                 </p>
               </div>
               <div className="flex shrink-0 gap-1">

@@ -3,9 +3,12 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { announcements, contactMessages, db, events, members } from "@/db";
 import { Button, Card, Empty, Field, Input, PageHeader, Select, Stat, Textarea, formatDate, formatDateTime } from "@/components/ui";
+import { BirthdaysCard } from "@/components/birthdays-card";
 import { PostsCard } from "@/components/posts-card";
 import { requireRole } from "@/lib/auth";
+import { birthdayLabel, monthDayOf } from "@/lib/birthdays";
 import { getLastAttendance, getVisitors } from "@/lib/comptage";
+import { toDateInput } from "@/lib/dates";
 import { formatSabbath, sabbathDate } from "@/lib/sabbath";
 import { DEPARTMENTS } from "@/lib/departments";
 import {
@@ -57,9 +60,10 @@ async function Content({ searchParams }: { searchParams: SearchParams }) {
 
       <Card title={`Visiteurs du Sabbat · ${formatSabbath(sabbath)}`} action={<a href="/espace/comptage/ecran" target="_blank" rel="noreferrer" className="text-xs font-semibold text-accent hover:underline">Écran de bienvenue ↗</a>}>
         <p className="mb-4 text-sm text-muted">Inscrivez les visiteurs du jour : leurs prénoms s&apos;affichent en grand sur l&apos;écran de comptage, en alternance avec les chiffres, pour leur souhaiter la bienvenue.</p>
-        <form action={addVisitor} className="mb-5 grid gap-3 rounded-xl bg-subtle p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+        <form action={addVisitor} className="mb-5 grid gap-3 rounded-xl bg-subtle p-4 sm:grid-cols-[1fr_1fr_11rem_auto] sm:items-end">
           <Field label="Prénom et nom"><Input name="name" required placeholder="Ex. Marie Jean-Baptiste" autoComplete="off" /></Field>
           <Field label="Venu(e) de (facultatif)"><Input name="origin" placeholder="Ex. Montréal · Église de Bethel" autoComplete="off" /></Field>
+          <Field label="Anniversaire (facultatif)"><Input name="birthday" type="date" /></Field>
           <Button type="submit">Ajouter</Button>
         </form>
         {visitors.length === 0 ? <Empty>Aucun visiteur inscrit pour ce Sabbat.</Empty> : (
@@ -69,7 +73,7 @@ async function Content({ searchParams }: { searchParams: SearchParams }) {
                 <span className="min-w-0">
                   <span className="mr-2 font-display-italic text-gold">{i + 1}</span>
                   <span className="font-medium">{v.name}</span>
-                  {v.origin && <span className="block truncate text-muted">{v.origin}</span>}
+                  {(v.origin || v.birthday) && <span className="block truncate text-muted">{[v.origin, v.birthday ? `🎂 ${birthdayLabel(v.birthday.slice(5))}` : null].filter(Boolean).join(" · ")}</span>}
                 </span>
                 <form action={deleteVisitor.bind(null, v.id)}><button className="px-1 text-muted hover:text-red-600" aria-label={`Retirer ${v.name}`}>×</button></form>
               </li>
@@ -160,7 +164,7 @@ async function Content({ searchParams }: { searchParams: SearchParams }) {
                   <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2">
                     <span className="font-medium">{m.lastName.toUpperCase()} {m.firstName}</span>
                     <span className="text-sm text-muted">
-                      {[m.phone, m.email, DEPARTMENTS.find((d) => d.slug === m.department)?.name].filter(Boolean).join(" · ")}
+                      {[m.phone, m.email, DEPARTMENTS.find((d) => d.slug === m.department)?.name, m.birthday ? `🎂 ${birthdayLabel(monthDayOf(m.birthday)!)}` : null].filter(Boolean).join(" · ")}
                     </span>
                   </summary>
                   <MemberForm action={updateMember.bind(null, m.id)} member={m} submitLabel="Enregistrer" />
@@ -174,6 +178,8 @@ async function Content({ searchParams }: { searchParams: SearchParams }) {
         )}
       </Card>
 
+      <BirthdaysCard />
+
       <PostsCard dept="secretariat" />
     </div>
   );
@@ -186,6 +192,7 @@ function MemberForm({ action, member, submitLabel }: { action: (f: FormData) => 
       <Field label="Nom"><Input name="lastName" required defaultValue={member?.lastName} /></Field>
       <Field label="Téléphone"><Input name="phone" type="tel" defaultValue={member?.phone ?? ""} /></Field>
       <Field label="E-mail"><Input name="email" type="email" defaultValue={member?.email ?? ""} /></Field>
+      <Field label="Date de naissance (facultatif)"><Input name="birthday" type="date" defaultValue={toDateInput(member?.birthday)} /></Field>
       <Field label="Département">
         <Select name="department" defaultValue={member?.department ?? ""}>
           <option value="">—</option>

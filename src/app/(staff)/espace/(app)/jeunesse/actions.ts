@@ -41,7 +41,7 @@ export async function addYouth(formData: FormData) {
   const firstName = text(formData, "firstName");
   const lastName = text(formData, "lastName");
   if (!firstName || !lastName) return;
-  await db.insert(members).values({ firstName, lastName, phone: text(formData, "phone") || null, department: "jeunesse" });
+  await db.insert(members).values({ firstName, lastName, phone: text(formData, "phone") || null, birthday: parseLocalDateTime(text(formData, "birthday")), department: "jeunesse" });
   await logAction(staff, "addYouth", "jeunesse");
   revalidatePath(PATH);
 }
