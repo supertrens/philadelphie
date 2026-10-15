@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Countdown } from "@/components/countdown";
+import { LiveCount } from "@/components/live-count";
 import { PageIntro } from "@/components/page-intro";
 import { Reveal } from "@/components/reveal";
 import { SermonCard } from "@/components/sermon-card";
@@ -36,10 +37,11 @@ export default async function LivePage({ params }: { params: Params }) {
   return (
     <>
       <PageIntro lang={lang} eyebrow={t.live.eyebrow} title={status.live ? t.live.onTitle : t.live.title} text={status.live ? t.live.text : t.live.offText} back={t.common.home}>
-        <div className="mt-6 flex items-center gap-3">
+        <div className="mt-6 flex flex-wrap items-center gap-3">
           <span className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] ${status.live ? "bg-red-600 text-white" : "border border-line bg-surface text-muted"}`}>
             <span className={`h-2 w-2 rounded-full ${status.live ? "animate-pulse bg-white" : "bg-muted"}`} /> {status.live ? t.live.badge : t.live.offline}
           </span>
+          {status.live && <LiveCount one={t.live.withUsOne} many={t.live.withUs} />}
         </div>
       </PageIntro>
 

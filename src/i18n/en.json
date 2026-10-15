@@ -18,7 +18,8 @@
     "direct": "Live",
     "bulletin": "Bulletin",
     "priere": "Prayer",
-    "liveNow": "Live now"
+    "liveNow": "Live now",
+    "vie": "Church life"
   },
   "hero": {
     "eyebrow": "Indianapolis · French-speaking · Adventist",
@@ -104,7 +105,7 @@
     "title": "Coming up",
     "empty": "Upcoming events will be announced here. Until then, join us this Sabbath!",
     "newsEyebrow": "Announcements",
-    "newsTitle": "Church life",
+    "newsTitle": "Worth noting",
     "newsEmpty": "No announcements right now."
   },
   "don": {
@@ -172,7 +173,9 @@
     "channel": "Our YouTube channel",
     "schedule": "Streaming schedule",
     "lastMessages": "Latest sermons",
-    "metaDescription": "Watch Philadelphie Seventh-day Adventist Church live, every Sabbath at 11:00 AM."
+    "metaDescription": "Watch Philadelphie Seventh-day Adventist Church live, every Sabbath at 11:00 AM.",
+    "withUsOne": "1 person with us this morning",
+    "withUs": "{n} people with us this morning"
   },
   "prayer": {
     "eyebrow": "Prayer",
@@ -225,5 +228,30 @@
     "open": "Open the PDF",
     "preview": "Bulletin preview",
     "metaDescription": "Weekly bulletin of Philadelphie Seventh-day Adventist Church: order of service and announcements."
+  },
+  "vie": {
+    "eyebrow": "Church life",
+    "title": "What we live together.",
+    "text": "News from our departments: outings, projects, moments of praise and fellowship, told by the people who live them.",
+    "homeTitle": "Church life",
+    "homeText": "The latest news from our departments.",
+    "all": "See all",
+    "filterLabel": "Filter by department",
+    "department": "Department",
+    "empty": "The first news will be published here very soon.",
+    "emptyDept": "No posts from this department yet.",
+    "more": "More news",
+    "publishedOn": "Published on",
+    "by": "By",
+    "metaDescription": "Life at Philadelphie Seventh-day Adventist Church in Indianapolis: department news, outings, projects and shared moments."
+  },
+  "departments": {
+    "secretariat": "Secretariat",
+    "pastorat": "Pastoral team & Elders",
+    "jeunesse": "Youth",
+    "enfants": "Children & Sabbath School",
+    "louange": "Music & Praise",
+    "tresorerie": "Treasury",
+    "media": "Media & Communication"
   }
 }

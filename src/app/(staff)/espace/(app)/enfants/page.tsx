@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Button, Card, Empty, Field, Input, PageHeader, Stat, formatDate } from "@/components/ui";
 import { classSessions, classes, db, teachers } from "@/db";
+import { PostsCard } from "@/components/posts-card";
 import { requireRole } from "@/lib/auth";
 import { addClass, addSession, addTeacher, deleteClass, deleteSession, deleteTeacher } from "./actions";
 
@@ -97,6 +98,8 @@ async function Content() {
           </div>
         )}
       </Card>
+
+      <PostsCard dept="enfants" />
     </div>
   );
 }

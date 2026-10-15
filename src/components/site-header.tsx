@@ -16,6 +16,7 @@ function navLinks(lang: Locale, nav: Nav, live: boolean) {
   return [
     { href: `/${lang}#venir`, label: nav.venir },
     { href: `/${lang}/messages`, label: nav.messages },
+    { href: `/${lang}/vie`, label: nav.vie },
     { href: `/${lang}/en-direct`, label: nav.direct, live },
     { href: `/${lang}/bulletin`, label: nav.bulletin },
     { href: `/${lang}/priere`, label: nav.priere },
@@ -52,7 +53,8 @@ function NavLinks({ lang, nav, live, mobile = false, onNavigate, pathname }: Pro
     <>
       {links.map((l) =>
         l.live ? (
-          <LiveBadge key={l.href} lang={lang} label={nav.liveNow} />
+          // Libellé court sur le bureau : la pastille qui pulse dit déjà « maintenant »
+          <LiveBadge key={l.href} lang={lang} label={nav.direct} />
         ) : (
           <Link key={l.href} href={l.href} aria-current={isActive(l.href) ? "page" : undefined} className={`relative whitespace-nowrap transition-colors hover:text-accent after:absolute after:-bottom-1 after:left-0 after:h-px after:bg-gold after:transition-all hover:after:w-full ${isActive(l.href) ? "text-accent after:w-full" : "after:w-0"}`}>{l.label}</Link>
         ),
@@ -107,13 +109,14 @@ export function SiteHeader({ lang, nav, sousTitre, live = false }: { lang: Local
       <div className="h-1 bg-gradient-to-r from-gold via-gold-strong to-gold" />
       <nav className={`mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 transition-[padding] duration-300 sm:px-8 ${scrolled ? "py-3" : "py-5"}`}>
         <Brand lang={lang} sousTitre={sousTitre} onClick={close} />
-        <div className="hidden items-center gap-5 text-[12px] font-semibold uppercase tracking-[0.14em] text-night lg:flex xl:gap-7 xl:text-[13px]">
+        {/* Neuf liens : la barre complète n'apparaît qu'à partir de 1280 px, le menu plein écran sert en dessous */}
+        <div className="hidden items-center gap-5 text-[12px] font-semibold uppercase tracking-[0.14em] text-night xl:flex 2xl:gap-7 2xl:text-[13px]">
           <Suspense fallback={<NavLinks lang={lang} nav={nav} live={live} pathname={null} />}>
             <NavLinksLive lang={lang} nav={nav} live={live} />
           </Suspense>
           <a href={eglise.don} target="_blank" rel="noreferrer" className="rounded-full bg-gold px-5 py-2 text-night transition hover:bg-gold-strong">{nav.donner}</a>
         </div>
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex items-center gap-2 xl:hidden">
           {/* En direct : la pastille remplace le sélecteur de langue (présent dans le menu) */}
           {live ? <LiveBadge lang={lang} label={nav.direct} /> : <a href={`/${other}`} aria-label={nav.switchAria} className="rounded-full border border-line px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider">{nav.switch}</a>}
           <button className="rounded-lg p-2" aria-label={nav.menuOpen} aria-expanded={open} aria-controls="menu-mobile" onClick={() => setOpen(true)}>
@@ -122,7 +125,7 @@ export function SiteHeader({ lang, nav, sousTitre, live = false }: { lang: Local
         </div>
       </nav>
       {open && (
-        <div id="menu-mobile" role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex flex-col bg-bg text-night lg:hidden">
+        <div id="menu-mobile" role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex flex-col bg-bg text-night xl:hidden">
           <div className="h-1 bg-gradient-to-r from-gold via-gold-strong to-gold" />
           <div className="flex items-center justify-between px-5 py-5 sm:px-8">
             <Brand lang={lang} sousTitre={sousTitre} onClick={close} />

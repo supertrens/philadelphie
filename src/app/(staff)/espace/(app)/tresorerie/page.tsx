@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { FileUpload } from "@/components/file-upload";
 import { Button, Card, Empty, Field, Input, PageHeader, Select, Stat, formatDate } from "@/components/ui";
 import { db, expenses, offerings } from "@/db";
+import { PostsCard } from "@/components/posts-card";
 import { requireRole } from "@/lib/auth";
 import { addExpense, addOffering, approveExpense, deleteExpense, deleteOffering } from "./actions";
 
@@ -123,6 +124,8 @@ async function Content() {
           )}
         </Card>
       </div>
+
+      <PostsCard dept="tresorerie" />
     </div>
   );
 }

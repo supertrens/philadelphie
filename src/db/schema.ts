@@ -1,11 +1,13 @@
 import {
   boolean,
+  date,
   integer,
   pgTable,
   primaryKey,
   serial,
   text,
   timestamp,
+  unique,
 } from "drizzle-orm/pg-core";
 
 // ---------- Secrétariat ----------
@@ -214,6 +216,50 @@ export const mediaPosts = pgTable("media_posts", {
   publishAt: timestamp("publish_at"),
   // idee / pret / publie
   status: text("status").default("idee").notNull(),
+});
+
+// ---------- Vie de l'église (publications des départements) ----------
+export const posts = pgTable("posts", {
+  id: serial("id").primaryKey(),
+  // Département auteur (slug, ex. "jeunesse")
+  department: text("department").notNull(),
+  title: text("title").notNull(),
+  body: text("body").notNull(),
+  titleEn: text("title_en"),
+  bodyEn: text("body_en"),
+  // Photo dans le stockage Blob, dossier public/vie
+  photoPathname: text("photo_pathname"),
+  published: boolean("published").default(false).notNull(),
+  publishedAt: timestamp("published_at"),
+  createdBy: text("created_by").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ---------- Comptage du Sabbat (en direct) ----------
+export const attendanceLive = pgTable(
+  "attendance_live",
+  {
+    id: serial("id").primaryKey(),
+    // Date du Sabbat (AAAA-MM-JJ, heure d'Indianapolis)
+    date: date("date", { mode: "string" }).notNull(),
+    // adultes / enfants / visiteurs
+    category: text("category").notNull(),
+    count: integer("count").default(0).notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [unique("attendance_live_date_category").on(t.date, t.category)],
+);
+
+// Historique des présences par Sabbat (après clôture)
+export const servicesAttendance = pgTable("services_attendance", {
+  id: serial("id").primaryKey(),
+  date: date("date", { mode: "string" }).notNull().unique(),
+  adultes: integer("adultes").default(0).notNull(),
+  enfants: integer("enfants").default(0).notNull(),
+  visiteurs: integer("visiteurs").default(0).notNull(),
+  total: integer("total").default(0).notNull(),
+  closedBy: text("closed_by"),
+  closedAt: timestamp("closed_at").defaultNow().notNull(),
 });
 
 export const settings = pgTable("settings", {

@@ -1,7 +1,7 @@
 import "server-only";
-import { and, asc, desc, eq, gte } from "drizzle-orm";
+import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
-import { announcements, bulletins, db, events, sermons, settings } from "@/db";
+import { announcements, bulletins, db, events, posts, sermons, settings } from "@/db";
 
 /**
  * Données du site public, mises en cache et invalidées par `updateTag("public")`
@@ -22,11 +22,31 @@ export async function getHomeContent() {
   "use cache";
   cacheTag("public");
   cacheLife("minutes");
-  const [news, upcoming] = await Promise.all([
+  const [news, upcoming, vie] = await Promise.all([
     db.select().from(announcements).where(eq(announcements.published, true)).orderBy(desc(announcements.createdAt)).limit(3),
     db.select().from(events).where(and(eq(events.isPublic, true), gte(events.startsAt, new Date()))).orderBy(asc(events.startsAt)).limit(5),
+    db.select().from(posts).where(eq(posts.published, true)).orderBy(postOrder).limit(6),
   ]);
-  return { news, upcoming };
+  return { news, upcoming, vie };
+}
+
+/** Publications « Vie de l'église » : les plus récentes d'abord (date de publication, sinon de création). */
+const postOrder = desc(sql`coalesce(${posts.publishedAt}, ${posts.createdAt})`);
+
+export async function getPosts() {
+  "use cache";
+  cacheTag("public");
+  cacheLife("minutes");
+  return db.select().from(posts).where(eq(posts.published, true)).orderBy(postOrder).limit(120);
+}
+
+export async function getPost(id: number) {
+  "use cache";
+  cacheTag("public");
+  cacheLife("minutes");
+  if (!Number.isInteger(id) || id <= 0) return null;
+  const [row] = await db.select().from(posts).where(and(eq(posts.id, id), eq(posts.published, true))).limit(1);
+  return row ?? null;
 }
 
 export async function getSermons() {

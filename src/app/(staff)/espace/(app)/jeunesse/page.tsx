@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { attendance, db, events, members } from "@/db";
 import { Button, Card, Empty, Field, Input, PageHeader, Stat, Textarea, formatDateTime } from "@/components/ui";
+import { PostsCard } from "@/components/posts-card";
 import { requireRole } from "@/lib/auth";
 import { addEvent, addYouth, deleteEvent, saveAttendance } from "./actions";
 
@@ -85,6 +86,8 @@ async function Content() {
           </ul>
         )}
       </Card>
+
+      <PostsCard dept="jeunesse" />
     </div>
   );
 }

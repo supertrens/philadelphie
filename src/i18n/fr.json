@@ -18,7 +18,8 @@
     "direct": "En direct",
     "bulletin": "Bulletin",
     "priere": "Prière",
-    "liveNow": "En direct maintenant"
+    "liveNow": "En direct maintenant",
+    "vie": "Vie de l’église"
   },
   "hero": {
     "eyebrow": "Indianapolis · Francophone · Adventiste",
@@ -104,7 +105,7 @@
     "title": "À venir",
     "empty": "Les prochains événements seront annoncés ici. En attendant, rejoignez-nous ce Sabbat !",
     "newsEyebrow": "Annonces",
-    "newsTitle": "Vie de l’église",
+    "newsTitle": "À noter",
     "newsEmpty": "Aucune annonce pour le moment."
   },
   "don": {
@@ -172,7 +173,9 @@
     "channel": "Notre chaîne YouTube",
     "schedule": "Horaires de diffusion",
     "lastMessages": "Derniers messages",
-    "metaDescription": "Suivez le culte de l’Église Adventiste Philadelphie en direct, chaque Sabbat à 11h00."
+    "metaDescription": "Suivez le culte de l’Église Adventiste Philadelphie en direct, chaque Sabbat à 11h00.",
+    "withUsOne": "1 personne avec nous ce matin",
+    "withUs": "{n} personnes avec nous ce matin"
   },
   "prayer": {
     "eyebrow": "Prière",
@@ -225,5 +228,30 @@
     "open": "Ouvrir le PDF",
     "preview": "Aperçu du bulletin",
     "metaDescription": "Bulletin hebdomadaire de l’Église Adventiste Philadelphie : programme du culte et annonces."
+  },
+  "vie": {
+    "eyebrow": "Vie de l’église",
+    "title": "Ce que nous vivons ensemble.",
+    "text": "Les nouvelles des départements : sorties, projets, moments de louange et de partage, racontés par ceux qui les vivent.",
+    "homeTitle": "Vie de l’église",
+    "homeText": "Les dernières nouvelles de nos départements.",
+    "all": "Tout voir",
+    "filterLabel": "Filtrer par département",
+    "department": "Département",
+    "empty": "Les premières nouvelles seront publiées ici très bientôt.",
+    "emptyDept": "Aucune publication pour ce département.",
+    "more": "Autres nouvelles",
+    "publishedOn": "Publié le",
+    "by": "Par",
+    "metaDescription": "La vie de l’Église Adventiste Philadelphie à Indianapolis : nouvelles des départements, sorties, projets et moments partagés."
+  },
+  "departments": {
+    "secretariat": "Secrétariat",
+    "pastorat": "Pastorat & Anciens",
+    "jeunesse": "Jeunesse",
+    "enfants": "Enfants & École du Sabbat",
+    "louange": "Musique & Louange",
+    "tresorerie": "Trésorerie",
+    "media": "Média & Communication"
   }
 }

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { db, rota, services, setlist, songs } from "@/db";
 import { Button, Card, Empty, Field, Input, PageHeader, Select, Stat, formatDate } from "@/components/ui";
+import { PostsCard } from "@/components/posts-card";
 import { requireRole } from "@/lib/auth";
 import {
   addRota, addService, addSong, addToSetlist, deleteService, deleteSong, removeFromSetlist, removeRota,
@@ -132,6 +133,8 @@ async function Content() {
           </ul>
         )}
       </Card>
+
+      <PostsCard dept="louange" />
     </div>
   );
 }

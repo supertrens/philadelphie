@@ -6,6 +6,7 @@ import { eglise } from "@/config/eglise";
 import { Countdown } from "@/components/countdown";
 import { LiveBadge } from "@/components/live-badge";
 import { Marquee } from "@/components/marquee";
+import { PostCard } from "@/components/post-card";
 import { Reveal } from "@/components/reveal";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -42,7 +43,7 @@ function churchJsonLd(lang: Locale) {
 export default async function Home({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
-  const [t, { news, upcoming }, status] = await Promise.all([getDictionary(lang), getHomeContent(), getLiveStatus()]);
+  const [t, { news, upcoming, vie }, status] = await Promise.all([getDictionary(lang), getHomeContent(), getLiveStatus()]);
   const x = eglise.t(lang);
   const slots = eglise.creneaux.map((c) => ({ ...c, nom: x.cultes[c.index].nom, heure: x.cultes[c.index].heure }));
   const pick = (fr: string, en: string | null) => (lang === "en" && en ? en : fr);
@@ -274,6 +275,31 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                 </ul>
               )}
             </Reveal>
+          </div>
+        </section>
+
+        {/* ---------- Vie de l'église : publications des départements ---------- */}
+        <section id="vie" className="bg-subtle py-24">
+          <div className="mx-auto max-w-7xl px-5 sm:px-8">
+            <Reveal>
+              <div className="flex flex-wrap items-end justify-between gap-6">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{t.vie.eyebrow}</p>
+                  <h2 className="mt-4 font-display text-4xl leading-tight font-semibold text-night sm:text-5xl">{t.vie.title}</h2>
+                  <p className="mt-4 max-w-xl text-muted text-pretty">{t.vie.homeText}</p>
+                </div>
+                <Link href={`/${lang}/vie`} className="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline">
+                  {t.vie.all} <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </Reveal>
+            {vie.length === 0 ? (
+              <Reveal><p className="mt-10 rounded-3xl border border-dashed border-line px-6 py-14 text-center text-muted">{t.vie.empty}</p></Reveal>
+            ) : (
+              <div className="mt-12 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+                {vie.map((p, i) => <PostCard key={p.id} post={p} lang={lang} dept={t.departments[p.department as keyof typeof t.departments] ?? p.department} delay={(i % 3) * 70} />)}
+              </div>
+            )}
           </div>
         </section>
 

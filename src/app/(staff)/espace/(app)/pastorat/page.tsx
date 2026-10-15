@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Button, Card, Empty, Field, Input, PageHeader, Stat, Textarea, formatDate } from "@/components/ui";
 import { db, prayerRequests, sermonPlans, visits } from "@/db";
+import { PostsCard } from "@/components/posts-card";
 import { requireRole } from "@/lib/auth";
 import { addPrayer, addSermonPlan, addVisit, deletePrayer, deleteSermonPlan, deleteVisit, setPrayerStatus } from "./actions";
 
@@ -127,6 +128,8 @@ async function Content() {
           )}
         </Card>
       </div>
+
+      <PostsCard dept="pastorat" />
     </div>
   );
 }

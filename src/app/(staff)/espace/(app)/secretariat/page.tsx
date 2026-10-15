@@ -3,7 +3,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { announcements, contactMessages, db, events, members } from "@/db";
 import { Button, Card, Empty, Field, Input, PageHeader, Select, Stat, Textarea, formatDate, formatDateTime } from "@/components/ui";
+import { PostsCard } from "@/components/posts-card";
 import { requireRole } from "@/lib/auth";
+import { getLastAttendance } from "@/lib/comptage";
+import { formatSabbath } from "@/lib/sabbath";
 import { DEPARTMENTS } from "@/lib/departments";
 import {
   addAnnouncement, addMember, deleteAnnouncement, deleteContactMessage, deleteMember, setContactStatus, toggleAnnouncement, updateMember,
@@ -30,22 +33,24 @@ async function Content({ searchParams }: { searchParams: SearchParams }) {
   const q = String((await searchParams).q ?? "").trim();
   const search = q ? or(ilike(members.firstName, `%${q}%`), ilike(members.lastName, `%${q}%`), ilike(members.email, `%${q}%`)) : undefined;
 
-  const [memberList, annList, inbox, [{ total }], [{ upcoming }]] = await Promise.all([
+  const [memberList, annList, inbox, [{ total }], [{ upcoming }], lastAttendance] = await Promise.all([
     db.select().from(members).where(search).orderBy(members.lastName, members.firstName),
     db.select().from(announcements).orderBy(desc(announcements.createdAt)),
     db.select().from(contactMessages).orderBy(desc(contactMessages.createdAt)).limit(100),
     db.select({ total: count() }).from(members),
     db.select({ upcoming: count() }).from(events).where(and(gte(events.startsAt, new Date()), eq(events.isPublic, true))),
+    getLastAttendance(),
   ]);
   const unread = inbox.filter((m) => m.status !== "traite");
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <Stat label="Membres" value={total} />
         <Stat label="Messages à traiter" value={unread.length} />
         <Stat label="Annonces publiées" value={annList.filter((a) => a.published).length} />
         <Stat label="Événements à venir" value={upcoming} />
+        <Stat label={lastAttendance ? `Présents · ${formatSabbath(lastAttendance.date).replace(/^samedi /, "")}` : "Présents (dernier Sabbat)"} value={lastAttendance ? lastAttendance.total : "—"} />
       </div>
 
       <Card title={`Messages reçus${unread.length ? ` (${unread.length} à traiter)` : ""}`}>
@@ -143,6 +148,8 @@ async function Content({ searchParams }: { searchParams: SearchParams }) {
           </ul>
         )}
       </Card>
+
+      <PostsCard dept="secretariat" />
     </div>
   );
 }

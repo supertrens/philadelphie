@@ -1,6 +1,6 @@
 import { UserButton } from "@clerk/nextjs";
 import {
-  Baby, Coins, ExternalLink, FileText, HeartHandshake, LayoutDashboard, Music, Sparkles, Tv, Users,
+  Baby, Coins, ExternalLink, FileText, Hash, HeartHandshake, LayoutDashboard, Music, Sparkles, Tv, Users,
 } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -50,6 +50,7 @@ async function Nav() {
     <nav className="flex flex-col gap-3 px-3 pb-3 md:flex-1 md:overflow-y-auto md:pb-4">
       <div className="flex gap-1 overflow-x-auto md:flex-col">
         <NavLink href="/espace" icon={LayoutDashboard} label="Tableau de bord" />
+        <NavLink href="/espace/comptage" icon={Hash} label="Comptage du Sabbat" />
         {visible.map((d) => <NavLink key={d.slug} href={`/espace/${d.slug}`} icon={ICONS[d.slug]} label={d.name} />)}
         {can(staff, "admin") && <NavLink href="/espace/admin" icon={Users} label="Utilisateurs & accès" />}
       </div>

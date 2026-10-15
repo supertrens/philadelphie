@@ -8,6 +8,7 @@ type Nav = (typeof import("@/i18n/fr.json"))["nav"];
 export function SiteFooter({ lang, t, nav }: { lang: Locale; t: { rdv: string; find: string; directions: string; espace: string }; nav: Nav }) {
   const pages = [
     { href: `/${lang}/messages`, label: nav.messages },
+    { href: `/${lang}/vie`, label: nav.vie },
     { href: `/${lang}/en-direct`, label: nav.direct },
     { href: `/${lang}/bulletin`, label: nav.bulletin },
     { href: `/${lang}/priere`, label: nav.priere },

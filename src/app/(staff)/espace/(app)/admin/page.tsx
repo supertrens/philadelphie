@@ -2,6 +2,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Button, Card, Empty, Field, Input, PageHeader } from "@/components/ui";
+import { PostsCard } from "@/components/posts-card";
 import { requireRole } from "@/lib/auth";
 import { DEPARTMENTS, isRole } from "@/lib/departments";
 import { inviteUser, revokeInvitation, setBanned, updateRoles } from "./actions";
@@ -86,6 +87,8 @@ async function Content() {
           </ul>
         )}
       </Card>
+
+      <PostsCard />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { FileUpload } from "@/components/file-upload";
 import { Button, Card, Empty, Field, Input, PageHeader, Select, Stat, formatDate } from "@/components/ui";
 import { bulletins, db, mediaPosts, sermons, settings } from "@/db";
+import { PostsCard } from "@/components/posts-card";
 import { requireRole } from "@/lib/auth";
 import {
   addBulletin, addPost, addSermon, deleteBulletin, deletePost, deleteSermon, saveLiveSettings, setPostStatus, toggleSermon,
@@ -140,6 +141,8 @@ async function Content() {
           )}
         </Card>
       </div>
+
+      <PostsCard dept="media" />
     </div>
   );
 }
