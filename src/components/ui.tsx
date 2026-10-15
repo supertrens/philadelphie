@@ -26,8 +26,8 @@ export function Field({ label, children }: { label: string; children: ReactNode 
   );
 }
 
-export function Input(props: ComponentProps<"input">) {
-  return <input {...props} className={`${inputClass} ${props.className ?? ""}`} />;
+export function Input({ ref, ...props }: ComponentProps<"input">) {
+  return <input ref={ref} {...props} className={`${inputClass} ${props.className ?? ""}`} />;
 }
 
 export function Textarea(props: ComponentProps<"textarea">) {

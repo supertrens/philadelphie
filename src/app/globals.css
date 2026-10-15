@@ -157,6 +157,15 @@ body {
   to { width: 100%; }
 }
 .cycle-bar { animation: cycle var(--cycle, 10s) linear both; }
+@keyframes confetti-fall {
+  0% { transform: translate3d(0, -12vh, 0) rotate(0deg); }
+  25% { transform: translate3d(3vw, 16vh, 0) rotate(180deg); }
+  50% { transform: translate3d(-2vw, 45vh, 0) rotate(360deg); }
+  75% { transform: translate3d(3vw, 75vh, 0) rotate(540deg); }
+  100% { transform: translate3d(-1vw, 112vh, 0) rotate(720deg); }
+}
+.confetti { top: 0; animation: confetti-fall linear infinite; }
 @media (prefers-reduced-motion: reduce) {
   .pop, .drift, .drift-slow, .screen-in { animation: none; }
+  .confetti { display: none; }
 }

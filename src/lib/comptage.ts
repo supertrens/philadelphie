@@ -1,8 +1,8 @@
 import "server-only";
-import { asc, desc, eq } from "drizzle-orm";
+import { asc, desc, eq, sql } from "drizzle-orm";
 import { attendanceLive, db, sabbathVisitors, servicesAttendance } from "@/db";
 import { getBirthdaysOfWeek } from "./birthdays";
-import { CATEGORIES, type LiveCounts, type LiveScreenData, type Visitor, sabbathDate } from "./sabbath";
+import { CATEGORIES, type Category, type LiveCounts, type LiveScreenData, type Visitor, sabbathDate } from "./sabbath";
 
 /** Compteurs en direct du Sabbat (lecture directe, jamais mise en cache). */
 export async function getLiveCounts(date = sabbathDate()): Promise<LiveCounts> {
@@ -43,4 +43,18 @@ export async function getVisitors(date = sabbathDate()): Promise<Visitor[]> {
 export async function getScreenData(date = sabbathDate()): Promise<LiveScreenData> {
   const [counts, visitors, birthdays] = await Promise.all([getLiveCounts(date), getVisitors(date), getBirthdaysOfWeek(date)]);
   return { ...counts, visitors, birthdays };
+}
+
+/**
+ * +delta sur une catégorie du Sabbat, en SQL (`count = GREATEST(count + delta, 0)`) :
+ * plusieurs personnes peuvent compter en même temps sans perdre de clic.
+ */
+export async function incrementLive(category: Category, delta: number, date = sabbathDate()) {
+  await db
+    .insert(attendanceLive)
+    .values({ date, category, count: Math.max(delta, 0) })
+    .onConflictDoUpdate({
+      target: [attendanceLive.date, attendanceLive.category],
+      set: { count: sql`GREATEST(${attendanceLive.count} + ${delta}, 0)`, updatedAt: new Date() },
+    });
 }

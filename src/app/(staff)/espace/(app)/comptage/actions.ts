@@ -1,11 +1,10 @@
 "use server";
 
-import { sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { attendanceLive, db, servicesAttendance } from "@/db";
+import { db, servicesAttendance } from "@/db";
 import { logAction } from "@/lib/audit";
 import { requireStaff } from "@/lib/auth";
-import { getLiveCounts } from "@/lib/comptage";
+import { getLiveCounts, incrementLive } from "@/lib/comptage";
 import { CATEGORIES, type Category, type LiveCounts, sabbathDate } from "@/lib/sabbath";
 
 /**
@@ -16,13 +15,7 @@ export async function bump(category: Category, delta: 1 | -1): Promise<LiveCount
   await requireStaff();
   if (!CATEGORIES.includes(category) || (delta !== 1 && delta !== -1)) throw new Error("Valeur invalide");
   const date = sabbathDate();
-  await db
-    .insert(attendanceLive)
-    .values({ date, category, count: Math.max(delta, 0) })
-    .onConflictDoUpdate({
-      target: [attendanceLive.date, attendanceLive.category],
-      set: { count: sql`GREATEST(${attendanceLive.count} + ${delta}, 0)`, updatedAt: new Date() },
-    });
+  await incrementLive(category, delta, date);
   return getLiveCounts(date);
 }
 

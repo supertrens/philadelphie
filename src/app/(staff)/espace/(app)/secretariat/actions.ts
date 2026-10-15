@@ -2,11 +2,11 @@
 
 import { eq } from "drizzle-orm";
 import { revalidatePath, updateTag } from "next/cache";
-import { announcements, contactMessages, db, members, sabbathVisitors } from "@/db";
+import { announcements, contactMessages, db, members } from "@/db";
 import { logAction } from "@/lib/audit";
 import { requireRole } from "@/lib/auth";
 import { parseLocalDateTime } from "@/lib/dates";
-import { sabbathDate } from "@/lib/sabbath";
+import { registerVisitor, removeVisitor } from "@/lib/visitors/actions";
 
 const PATH = "/espace/secretariat";
 const text = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
@@ -90,21 +90,13 @@ export async function deleteContactMessage(id: number) {
   revalidatePath(PATH);
 }
 
-// ---------- Visiteurs du Sabbat (affichés sur l'écran de bienvenue) ----------
+// ---------- Visiteurs du Sabbat (affichés sur l'écran de bienvenue, comptés dans le comptage) ----------
 export async function addVisitor(formData: FormData) {
-  const staff = await requireRole("secretariat");
-  const name = text(formData, "name");
-  if (!name) return;
-  await db.insert(sabbathVisitors).values({ date: sabbathDate(), name, origin: optional(formData, "origin"), birthday: optional(formData, "birthday"), createdBy: staff.name });
-  await logAction(staff, "ajout", "visiteur");
-  revalidatePath(PATH);
-  revalidatePath("/espace/comptage");
+  await requireRole("secretariat");
+  await registerVisitor({ name: text(formData, "name"), origin: text(formData, "origin"), birthday: text(formData, "birthday") });
 }
 
 export async function deleteVisitor(id: number) {
-  const staff = await requireRole("secretariat");
-  await db.delete(sabbathVisitors).where(eq(sabbathVisitors.id, id));
-  await logAction(staff, "suppression", "visiteur", id);
-  revalidatePath(PATH);
-  revalidatePath("/espace/comptage");
+  await requireRole("secretariat");
+  await removeVisitor(id);
 }

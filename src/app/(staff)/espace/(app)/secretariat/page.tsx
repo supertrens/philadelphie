@@ -59,7 +59,7 @@ async function Content({ searchParams }: { searchParams: SearchParams }) {
       </div>
 
       <Card title={`Visiteurs du Sabbat · ${formatSabbath(sabbath)}`} action={<a href="/espace/comptage/ecran" target="_blank" rel="noreferrer" className="text-xs font-semibold text-accent hover:underline">Écran de bienvenue ↗</a>}>
-        <p className="mb-4 text-sm text-muted">Inscrivez les visiteurs du jour : leurs prénoms s&apos;affichent en grand sur l&apos;écran de comptage, en alternance avec les chiffres, pour leur souhaiter la bienvenue.</p>
+        <p className="mb-4 text-sm text-muted">Inscrivez les visiteurs du jour : leur nom s&apos;affiche en grand sur l&apos;écran de bienvenue, et chaque inscription compte +1 dans le comptage du Sabbat (retirer un nom enlève 1).</p>
         <form action={addVisitor} className="mb-5 grid gap-3 rounded-xl bg-subtle p-4 sm:grid-cols-[1fr_1fr_11rem_auto] sm:items-end">
           <Field label="Prénom et nom"><Input name="name" required placeholder="Ex. Marie Jean-Baptiste" autoComplete="off" /></Field>
           <Field label="Venu(e) de (facultatif)"><Input name="origin" placeholder="Ex. Montréal · Église de Bethel" autoComplete="off" /></Field>
