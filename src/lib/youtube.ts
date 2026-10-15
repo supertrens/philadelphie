@@ -2,10 +2,12 @@ import "server-only";
 import { eglise } from "@/config/eglise";
 
 /**
- * Lecture de la chaîne YouTube de l'église sans clé d'API :
- * 1. flux RSS de la chaîne (dates exactes) ;
- * 2. sinon, la page des directs de la chaîne (dates exactes lues sur chaque vidéo).
- * La détection du direct passe par l'adresse « /live » de la chaîne.
+ * Lecture de la chaîne YouTube de l'église :
+ * 1. API YouTube Data v3 si `YOUTUBE_API_KEY` est défini (le plus fiable) ;
+ * 2. sinon flux RSS de la chaîne (dates exactes) ;
+ * 3. sinon la page des directs de la chaîne (dates exactes lues sur chaque vidéo).
+ * La détection du direct passe par l'adresse « /live » de la chaîne (gratuit),
+ * puis par l'API en secours.
  */
 
 export type ChannelVideo = { videoId: string; title: string; date: Date; generic: boolean };
@@ -25,6 +27,52 @@ async function fetchText(url: string, timeoutMs = 8000) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+async function fetchJson<T>(url: string, timeoutMs = 8000): Promise<T | null> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { signal: ctrl.signal, cache: "no-store" });
+    return res.ok ? ((await res.json()) as T) : null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+const API = "https://www.googleapis.com/youtube/v3";
+type ApiPlaylistItems = { items?: { contentDetails?: { videoId?: string; videoPublishedAt?: string } }[] };
+type ApiVideos = { items?: { id: string; snippet?: { title?: string; publishedAt?: string; liveBroadcastContent?: string }; liveStreamingDetails?: { actualStartTime?: string; scheduledStartTime?: string } }[] };
+
+/**
+ * API YouTube Data v3 : liste des envois de la chaîne (playlist « UU… ») puis détails
+ * des vidéos (début réel du direct). Deux requêtes, 2 unités de quota.
+ */
+async function fromApi(key: string, channelId: string, limit: number): Promise<ChannelVideo[] | null> {
+  const uploads = `UU${channelId.slice(2)}`;
+  const list = await fetchJson<ApiPlaylistItems>(`${API}/playlistItems?part=contentDetails&playlistId=${uploads}&maxResults=${Math.min(limit + 3, 50)}&key=${key}`);
+  const ids = (list?.items ?? []).map((i) => i.contentDetails?.videoId).filter((x): x is string => !!x);
+  if (ids.length === 0) return list ? [] : null;
+  const details = await fetchJson<ApiVideos>(`${API}/videos?part=snippet,liveStreamingDetails&id=${ids.join(",")}&key=${key}`);
+  if (!details) return null;
+  return (details.items ?? [])
+    // Les directs programmés mais pas encore commencés n'apparaissent pas
+    .filter((v) => v.snippet?.liveBroadcastContent !== "upcoming")
+    .map((v) => {
+      const title = v.snippet?.title ?? "";
+      const iso = v.liveStreamingDetails?.actualStartTime ?? v.snippet?.publishedAt ?? "";
+      return { videoId: v.id, title, date: new Date(iso), generic: GENERIC_TITLE.test(title) };
+    })
+    .filter((v) => !Number.isNaN(v.date.getTime()));
+}
+
+/** Direct en cours via l'API (recherche eventType=live : 100 unités, utilisé seulement en secours). */
+async function liveFromApi(key: string, channelId: string) {
+  const res = await fetchJson<{ items?: { id?: { videoId?: string } }[] }>(`${API}/search?part=id&channelId=${channelId}&eventType=live&type=video&maxResults=1&key=${key}`);
+  const videoId = res?.items?.[0]?.id?.videoId ?? null;
+  return res ? { live: !!videoId, videoId } : null;
 }
 
 const decode = (s: string) => s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
@@ -100,8 +148,12 @@ async function exactDate(videoId: string) {
 export async function fetchChannelVideos(limit = 12): Promise<ChannelVideo[]> {
   const id = eglise.youtubeChannelId;
   if (!id) return [];
-  const xml = await fetchText(`https://www.youtube.com/feeds/videos.xml?channel_id=${id}`);
-  let list = xml ? fromFeed(xml) : [];
+  const key = process.env.YOUTUBE_API_KEY;
+  let list = key ? ((await fromApi(key, id, limit)) ?? []) : [];
+  if (list.length === 0) {
+    const xml = await fetchText(`https://www.youtube.com/feeds/videos.xml?channel_id=${id}`);
+    list = xml ? fromFeed(xml) : [];
+  }
   if (list.length === 0) {
     const pages = await Promise.all([fetchText(`https://www.youtube.com/channel/${id}/streams`), fetchText(`https://www.youtube.com/channel/${id}/videos`)]);
     const raw = pages.flatMap((html) => (html ? fromPage(html) : [])).slice(0, limit);
@@ -121,7 +173,10 @@ export async function fetchLiveNow(): Promise<{ live: boolean; videoId: string |
   const id = eglise.youtubeChannelId;
   if (!id) return { live: false, videoId: null };
   const html = await fetchText(`https://www.youtube.com/channel/${id}/live`, 6000);
-  if (!html) return { live: false, videoId: null };
+  if (!html) {
+    const key = process.env.YOUTUBE_API_KEY;
+    return (key && (await liveFromApi(key, id))) || { live: false, videoId: null };
+  }
   const live = html.includes('"isLiveNow":true');
   const videoId = html.match(/<link rel="canonical" href="https:\/\/www\.youtube\.com\/watch\?v=([\w-]{11})"/)?.[1] ?? null;
   return { live, videoId: live ? videoId : null };
