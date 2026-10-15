@@ -127,3 +127,8 @@ body {
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 1px 0 0 var(--line), 0 10px 30px -18px rgba(0, 0, 0, 0.25);
 }
+
+/* Barre de navigation sur le héros : fondu crème pour garder les liens lisibles sur la photo */
+.nav-fade {
+  background: linear-gradient(to bottom, var(--bg) 0%, color-mix(in oklab, var(--bg) 80%, transparent) 60%, transparent 100%);
+}

@@ -163,16 +163,16 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                 </Link>
               </div>
             </Reveal>
-            {/* Mobile : bande à faire défiler · Desktop : rangée de cinq */}
-            <div className="snap-x-scroll -mx-5 mt-10 flex gap-4 overflow-x-auto px-5 pb-2 sm:-mx-8 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-5 lg:overflow-visible lg:px-0">
+            {/* Mobile : grille de deux colonnes (la 5e carte sur toute la largeur) · Desktop : rangée de cinq */}
+            <div className="mt-10 grid grid-cols-2 gap-3 lg:grid-cols-5 lg:gap-4">
               {t.ministeres.items.map((m, i) => (
-                <Reveal key={m.name} delay={i * 60} className="w-[16rem] shrink-0 lg:w-auto">
-                  <article className="group relative aspect-[3/4] overflow-hidden rounded-[1.5rem] lg:aspect-[4/5]">
-                    <Image src={PHOTOS[i]} alt="" fill sizes="(min-width:1024px) 20vw, 16rem" className="object-cover transition duration-700 group-hover:scale-105" />
+                <Reveal key={m.name} delay={i * 60} className={i === 4 ? "col-span-2 lg:col-span-1" : ""}>
+                  <article className={`group relative overflow-hidden rounded-[1.25rem] lg:aspect-[4/5] lg:rounded-[1.5rem] ${i === 4 ? "aspect-[2/1]" : "aspect-square"}`}>
+                    <Image src={PHOTOS[i]} alt="" fill sizes="(min-width:1024px) 20vw, 50vw" className="object-cover transition duration-700 group-hover:scale-105" />
                     <div className="absolute inset-0 bg-gradient-to-t from-night via-night/20 to-transparent" />
-                    <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+                    <div className="absolute inset-x-0 bottom-0 p-4 text-white lg:p-5">
                       <p className="font-display-italic text-lg text-gold">0{i + 1}</p>
-                      <h3 className="font-display text-2xl font-semibold">{m.name}</h3>
+                      <h3 className="font-display text-xl font-semibold lg:text-2xl">{m.name}</h3>
                       <p className="text-xs text-white/70">{m.sub}</p>
                     </div>
                   </article>
