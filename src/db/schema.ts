@@ -262,6 +262,17 @@ export const servicesAttendance = pgTable("services_attendance", {
   closedAt: timestamp("closed_at").defaultNow().notNull(),
 });
 
+// Visiteurs du Sabbat inscrits par le secrétariat (noms affichés sur l'écran de bienvenue)
+export const sabbathVisitors = pgTable("sabbath_visitors", {
+  id: serial("id").primaryKey(),
+  date: date("date", { mode: "string" }).notNull(),
+  name: text("name").notNull(),
+  // Ville, pays ou église d'origine (facultatif)
+  origin: text("origin"),
+  createdBy: text("created_by"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const settings = pgTable("settings", {
   key: text("key").primaryKey(),
   value: text("value").notNull(),

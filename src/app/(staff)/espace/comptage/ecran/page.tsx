@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { eglise } from "@/config/eglise";
 import { requireStaff } from "@/lib/auth";
-import { getLiveCounts } from "@/lib/comptage";
+import { getScreenData } from "@/lib/comptage";
 import { formatSabbath, sabbathDate } from "@/lib/sabbath";
 import { Screen } from "./screen";
 
@@ -20,6 +20,6 @@ export default function EcranPage() {
 async function Content() {
   await requireStaff();
   const date = sabbathDate();
-  const counts = await getLiveCounts(date);
-  return <Screen initial={counts} title={eglise.nom} dateLabel={formatSabbath(date)} />;
+  const data = await getScreenData(date);
+  return <Screen initial={data} title={eglise.nom} dateLabel={formatSabbath(date)} />;
 }

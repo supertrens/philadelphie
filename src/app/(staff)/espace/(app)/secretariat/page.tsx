@@ -5,11 +5,11 @@ import { announcements, contactMessages, db, events, members } from "@/db";
 import { Button, Card, Empty, Field, Input, PageHeader, Select, Stat, Textarea, formatDate, formatDateTime } from "@/components/ui";
 import { PostsCard } from "@/components/posts-card";
 import { requireRole } from "@/lib/auth";
-import { getLastAttendance } from "@/lib/comptage";
-import { formatSabbath } from "@/lib/sabbath";
+import { getLastAttendance, getVisitors } from "@/lib/comptage";
+import { formatSabbath, sabbathDate } from "@/lib/sabbath";
 import { DEPARTMENTS } from "@/lib/departments";
 import {
-  addAnnouncement, addMember, deleteAnnouncement, deleteContactMessage, deleteMember, setContactStatus, toggleAnnouncement, updateMember,
+  addAnnouncement, addMember, addVisitor, deleteAnnouncement, deleteContactMessage, deleteMember, deleteVisitor, setContactStatus, toggleAnnouncement, updateMember,
 } from "./actions";
 
 export const metadata: Metadata = { title: "Secrétariat" };
@@ -33,13 +33,15 @@ async function Content({ searchParams }: { searchParams: SearchParams }) {
   const q = String((await searchParams).q ?? "").trim();
   const search = q ? or(ilike(members.firstName, `%${q}%`), ilike(members.lastName, `%${q}%`), ilike(members.email, `%${q}%`)) : undefined;
 
-  const [memberList, annList, inbox, [{ total }], [{ upcoming }], lastAttendance] = await Promise.all([
+  const sabbath = sabbathDate();
+  const [memberList, annList, inbox, [{ total }], [{ upcoming }], lastAttendance, visitors] = await Promise.all([
     db.select().from(members).where(search).orderBy(members.lastName, members.firstName),
     db.select().from(announcements).orderBy(desc(announcements.createdAt)),
     db.select().from(contactMessages).orderBy(desc(contactMessages.createdAt)).limit(100),
     db.select({ total: count() }).from(members),
     db.select({ upcoming: count() }).from(events).where(and(gte(events.startsAt, new Date()), eq(events.isPublic, true))),
     getLastAttendance(),
+    getVisitors(sabbath),
   ]);
   const unread = inbox.filter((m) => m.status !== "traite");
 
@@ -52,6 +54,29 @@ async function Content({ searchParams }: { searchParams: SearchParams }) {
         <Stat label="Événements à venir" value={upcoming} />
         <Stat label={lastAttendance ? `Présents · ${formatSabbath(lastAttendance.date).replace(/^samedi /, "")}` : "Présents (dernier Sabbat)"} value={lastAttendance ? lastAttendance.total : "—"} />
       </div>
+
+      <Card title={`Visiteurs du Sabbat · ${formatSabbath(sabbath)}`} action={<a href="/espace/comptage/ecran" target="_blank" rel="noreferrer" className="text-xs font-semibold text-accent hover:underline">Écran de bienvenue ↗</a>}>
+        <p className="mb-4 text-sm text-muted">Inscrivez les visiteurs du jour : leurs prénoms s&apos;affichent en grand sur l&apos;écran de comptage, en alternance avec les chiffres, pour leur souhaiter la bienvenue.</p>
+        <form action={addVisitor} className="mb-5 grid gap-3 rounded-xl bg-subtle p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+          <Field label="Prénom et nom"><Input name="name" required placeholder="Ex. Marie Jean-Baptiste" autoComplete="off" /></Field>
+          <Field label="Venu(e) de (facultatif)"><Input name="origin" placeholder="Ex. Montréal · Église de Bethel" autoComplete="off" /></Field>
+          <Button type="submit">Ajouter</Button>
+        </form>
+        {visitors.length === 0 ? <Empty>Aucun visiteur inscrit pour ce Sabbat.</Empty> : (
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {visitors.map((v, i) => (
+              <li key={v.id} className="flex items-center justify-between gap-2 rounded-lg border border-line px-3 py-2 text-sm">
+                <span className="min-w-0">
+                  <span className="mr-2 font-display-italic text-gold">{i + 1}</span>
+                  <span className="font-medium">{v.name}</span>
+                  {v.origin && <span className="block truncate text-muted">{v.origin}</span>}
+                </span>
+                <form action={deleteVisitor.bind(null, v.id)}><button className="px-1 text-muted hover:text-red-600" aria-label={`Retirer ${v.name}`}>×</button></form>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
 
       <Card title={`Messages reçus${unread.length ? ` (${unread.length} à traiter)` : ""}`}>
         {inbox.length === 0 ? <Empty>Aucun message reçu via le formulaire de contact.</Empty> : (

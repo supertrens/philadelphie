@@ -1,9 +1,10 @@
 import { Tv } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { Button, Card, Empty, PageHeader } from "@/components/ui";
 import { requireStaff } from "@/lib/auth";
-import { getAttendanceHistory, getClosedAttendance, getLiveCounts } from "@/lib/comptage";
+import { getAttendanceHistory, getClosedAttendance, getLiveCounts, getVisitors } from "@/lib/comptage";
 import { formatSabbath, sabbathDate } from "@/lib/sabbath";
 import { closeDay } from "./actions";
 import { Counter } from "./counter";
@@ -24,7 +25,7 @@ export default function ComptagePage() {
 async function Content() {
   await requireStaff();
   const date = sabbathDate();
-  const [counts, closed, history] = await Promise.all([getLiveCounts(date), getClosedAttendance(date), getAttendanceHistory()]);
+  const [counts, closed, history, visitors] = await Promise.all([getLiveCounts(date), getClosedAttendance(date), getAttendanceHistory(), getVisitors(date)]);
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -35,6 +36,11 @@ async function Content() {
       </div>
 
       <Counter initial={counts} />
+
+      <p className="text-sm text-muted">
+        {visitors.length === 0 ? "Aucun visiteur inscrit par le secrétariat pour l'instant." : `${visitors.length} visiteur${visitors.length > 1 ? "s" : ""} inscrit${visitors.length > 1 ? "s" : ""} par le secrétariat : ${visitors.map((v) => v.name).join(", ")}.`}{" "}
+        <Link href="/espace/secretariat" className="font-semibold text-accent hover:underline">Inscrire un visiteur</Link> — les prénoms s&apos;affichent sur l&apos;écran de bienvenue.
+      </p>
 
       <Card title="Clôturer le comptage">
         <div className="flex flex-wrap items-center justify-between gap-4">

@@ -27,3 +27,6 @@ export type Category = (typeof CATEGORIES)[number];
 export const CATEGORY_LABELS: Record<Category, string> = { adultes: "Adultes", enfants: "Enfants", visiteurs: "Visiteurs" };
 
 export type LiveCounts = { date: string; adultes: number; enfants: number; visiteurs: number; total: number; updatedAt: string | null };
+export type Visitor = { id: number; name: string; origin: string | null };
+/** Données de l'écran : compteurs + visiteurs inscrits par le secrétariat. */
+export type LiveScreenData = LiveCounts & { visitors: Visitor[] };

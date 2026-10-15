@@ -1,7 +1,7 @@
 import "server-only";
-import { desc, eq } from "drizzle-orm";
-import { attendanceLive, db, servicesAttendance } from "@/db";
-import { CATEGORIES, type LiveCounts, sabbathDate } from "./sabbath";
+import { asc, desc, eq } from "drizzle-orm";
+import { attendanceLive, db, sabbathVisitors, servicesAttendance } from "@/db";
+import { CATEGORIES, type LiveCounts, type LiveScreenData, type Visitor, sabbathDate } from "./sabbath";
 
 /** Compteurs en direct du Sabbat (lecture directe, jamais mise en cache). */
 export async function getLiveCounts(date = sabbathDate()): Promise<LiveCounts> {
@@ -27,4 +27,19 @@ export async function getClosedAttendance(date: string) {
 /** Historique des présences (les plus récentes d'abord). */
 export async function getAttendanceHistory(limit = 12) {
   return db.select().from(servicesAttendance).orderBy(desc(servicesAttendance.date)).limit(limit);
+}
+
+/** Visiteurs inscrits pour un Sabbat (ordre d'inscription). */
+export async function getVisitors(date = sabbathDate()): Promise<Visitor[]> {
+  return db
+    .select({ id: sabbathVisitors.id, name: sabbathVisitors.name, origin: sabbathVisitors.origin })
+    .from(sabbathVisitors)
+    .where(eq(sabbathVisitors.date, date))
+    .orderBy(asc(sabbathVisitors.id));
+}
+
+/** Compteurs + visiteurs : ce que l'écran et /api/comptage renvoient. */
+export async function getScreenData(date = sabbathDate()): Promise<LiveScreenData> {
+  const [counts, visitors] = await Promise.all([getLiveCounts(date), getVisitors(date)]);
+  return { ...counts, visitors };
 }
