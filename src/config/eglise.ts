@@ -52,8 +52,9 @@ export const eglise = {
   carteEmbed: "https://maps.google.com/maps?q=3642+North+Emerson+Avenue,+Indianapolis,+IN&z=15&output=embed",
   telephone: "", // à venir
   email: "contact@philadelphiesdachurch.com",
-  // Chaîne YouTube de l'église (culte en direct et messages) — à confirmer
-  youtube: "https://www.youtube.com/@philadelphiesdachurch",
+  // Chaîne YouTube de l'église : directs du Sabbat et messages (lus automatiquement, voir src/lib/youtube.ts)
+  youtube: "https://www.youtube.com/@philadelphiefrench-haitian1191",
+  youtubeChannelId: "UCWvwtgNE1m4Q6WjXVGooA2A",
   facebook: "",
   // Dons en ligne : page AdventistGiving de l'église
   don: "https://adventistgiving.org/donate/ANF82G",

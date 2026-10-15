@@ -2,20 +2,35 @@ import "server-only";
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import { announcements, bulletins, db, events, posts, sermons, settings } from "@/db";
+import { fetchChannelVideos, fetchLiveNow } from "./youtube";
 
 /**
  * Données du site public, mises en cache et invalidées par `updateTag("public")`
  * depuis l'espace membres.
  */
 
+/** Direct : interrupteur manuel du Média (settings) OU direct détecté sur la chaîne YouTube. */
 export async function getLiveStatus() {
   "use cache";
   cacheTag("public");
   cacheLife("minutes");
-  const rows = await db.select().from(settings);
+  const [rows, yt] = await Promise.all([db.select().from(settings), fetchLiveNow().catch(() => ({ live: false, videoId: null }))]);
   const s = Object.fromEntries(rows.map((r) => [r.key, r.value]));
   const url = (s.live_url ?? "").trim();
-  return { live: s.live_now === "1", url: url || null, youtubeId: youtubeIdFromUrl(url) };
+  const manual = s.live_now === "1";
+  const youtubeId = youtubeIdFromUrl(url) ?? yt.videoId;
+  return { live: manual || yt.live, url: url || (youtubeId ? `https://www.youtube.com/watch?v=${youtubeId}` : null), youtubeId };
+}
+
+/** Un message public : enregistré par le Média (id numérique) ou lu sur la chaîne YouTube (id = identifiant vidéo). */
+export type PublicSermon = Omit<typeof sermons.$inferSelect, "id" | "published"> & { id: number | string };
+
+/** Dernières vidéos de la chaîne YouTube (rafraîchies toutes les heures). */
+export async function getChannelVideos() {
+  "use cache";
+  cacheTag("public");
+  cacheLife("hours");
+  return fetchChannelVideos(12).catch(() => []);
 }
 
 export async function getHomeContent() {
@@ -62,20 +77,32 @@ export async function getPost(id: number) {
   return row ?? null;
 }
 
-export async function getSermons() {
+/** Messages : ceux du Média, complétés par les vidéos de la chaîne YouTube non encore enregistrées. */
+export async function getSermons(): Promise<PublicSermon[]> {
   "use cache";
   cacheTag("public");
   cacheLife("minutes");
-  return db.select().from(sermons).where(eq(sermons.published, true)).orderBy(desc(sermons.date)).limit(200);
+  const [rows, videos] = await Promise.all([
+    db.select().from(sermons).where(eq(sermons.published, true)).orderBy(desc(sermons.date)).limit(200),
+    getChannelVideos(),
+  ]);
+  const known = new Set(rows.map((r) => r.youtubeId).filter(Boolean));
+  const extra: PublicSermon[] = videos
+    .filter((v) => !known.has(v.videoId))
+    .map((v) => ({ id: v.videoId, title: v.generic ? "" : v.title, speaker: null, date: v.date, youtubeId: v.videoId, audioPathname: null, series: null, scripture: null }));
+  return [...rows, ...extra].sort((a, b) => b.date.getTime() - a.date.getTime());
 }
 
-export async function getSermon(id: number) {
+export async function getSermon(id: string): Promise<PublicSermon | null> {
   "use cache";
   cacheTag("public");
   cacheLife("minutes");
-  if (!Number.isInteger(id) || id <= 0) return null;
-  const [row] = await db.select().from(sermons).where(and(eq(sermons.id, id), eq(sermons.published, true))).limit(1);
-  return row ?? null;
+  if (/^\d+$/.test(id)) {
+    const [row] = await db.select().from(sermons).where(and(eq(sermons.id, Number(id)), eq(sermons.published, true))).limit(1);
+    return row ?? null;
+  }
+  if (!/^[\w-]{11}$/.test(id)) return null;
+  return (await getSermons()).find((s) => s.id === id) ?? null;
 }
 
 export async function getBulletins() {

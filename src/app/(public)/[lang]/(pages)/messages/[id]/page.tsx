@@ -18,15 +18,16 @@ type Params = Promise<{ lang: string; id: string }>;
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { lang, id } = await params;
   if (!hasLocale(lang)) return {};
-  const sermon = await getSermon(Number(id));
+  const [t, sermon] = await Promise.all([getDictionary(lang), getSermon(id)]);
   if (!sermon) return {};
+  const title = sermon.title || `${t.sermons.serviceOf} ${longDate(sermon.date, lang)}`;
   const description = [sermon.speaker, sermon.scripture, sermon.series].filter(Boolean).join(" · ");
   return {
-    title: sermon.title,
-    description: description || sermon.title,
+    title,
+    description: description || title,
     alternates: { canonical: `/${lang}/messages/${sermon.id}`, languages: { fr: `/fr/messages/${sermon.id}`, en: `/en/messages/${sermon.id}` } },
     openGraph: {
-      title: `${sermon.title} · ${eglise.nom}`,
+      title: `${title} · ${eglise.nom}`,
       description: description || undefined,
       type: "video.other",
       ...(sermon.youtubeId ? { images: [{ url: `https://i.ytimg.com/vi/${sermon.youtubeId}/maxresdefault.jpg`, width: 1280, height: 720 }] } : {}),
@@ -59,8 +60,9 @@ function Skeleton() {
 async function Sermon({ params }: { params: Params }) {
   const { lang, id } = await params;
   if (!hasLocale(lang)) notFound();
-  const [t, sermon] = await Promise.all([getDictionary(lang), getSermon(Number(id))]);
+  const [t, sermon] = await Promise.all([getDictionary(lang), getSermon(id)]);
   if (!sermon) notFound();
+  const title = sermon.title || `${t.sermons.serviceOf} ${longDate(sermon.date, lang)}`;
   const all = await getSermons();
   const related = (sermon.series ? all.filter((s) => s.series === sermon.series && s.id !== sermon.id) : all.filter((s) => s.id !== sermon.id)).slice(0, 3);
   const audio = sermon.audioPathname ? fileUrl(sermon.audioPathname) : null;
@@ -68,8 +70,8 @@ async function Sermon({ params }: { params: Params }) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": sermon.youtubeId ? "VideoObject" : "AudioObject",
-    name: sermon.title,
-    description: [sermon.scripture, sermon.series].filter(Boolean).join(" · ") || sermon.title,
+    name: title,
+    description: [sermon.scripture, sermon.series].filter(Boolean).join(" · ") || title,
     uploadDate: sermon.date.toISOString(),
     ...(sermon.youtubeId ? { thumbnailUrl: `https://i.ytimg.com/vi/${sermon.youtubeId}/hqdefault.jpg`, embedUrl: `https://www.youtube.com/embed/${sermon.youtubeId}` } : {}),
     ...(audio ? { contentUrl: `${eglise.siteUrl}${audio}` } : {}),
@@ -92,7 +94,7 @@ async function Sermon({ params }: { params: Params }) {
               <div className="aspect-video">
                 <iframe
                   src={`https://www.youtube-nocookie.com/embed/${sermon.youtubeId}?rel=0`}
-                  title={sermon.title}
+                  title={title}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                   className="h-full w-full"
@@ -110,15 +112,15 @@ async function Sermon({ params }: { params: Params }) {
 
         <Reveal className="mt-12">
           {sermon.series && <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">{sermon.series}</p>}
-          <h1 className="mt-3 font-display text-4xl leading-tight font-semibold text-balance text-night sm:text-6xl">{sermon.title}</h1>
+          <h1 className="mt-3 font-display text-4xl leading-tight font-semibold text-balance text-night first-letter:uppercase sm:text-6xl">{title}</h1>
           <dl className="mt-8 grid gap-5 border-t hairline pt-8 sm:grid-cols-3">
             <Meta icon={Calendar} label={t.sermons.date} value={longDate(sermon.date, lang)} />
             {sermon.speaker && <Meta icon={Mic2} label={t.sermons.speaker} value={sermon.speaker} />}
             {sermon.scripture && <Meta icon={BookOpen} label={t.sermons.scripture} value={sermon.scripture} italic />}
           </dl>
           <div className="mt-10 flex flex-wrap items-center gap-3">
-            <ShareButton title={sermon.title} label={t.common.share} copied={t.common.copied} />
-            <WhatsAppShare text={sermon.title} url={`${eglise.siteUrl}/${lang}/messages/${sermon.id}`} label={t.common.whatsapp} />
+            <ShareButton title={title} label={t.common.share} copied={t.common.copied} />
+            <WhatsAppShare text={title} url={`${eglise.siteUrl}/${lang}/messages/${sermon.id}`} label={t.common.whatsapp} />
             {audio && (
               <a href={audio} download className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white transition hover:bg-accent-strong">
                 <Download className="h-4 w-4" /> {t.common.listen}
@@ -147,7 +149,7 @@ async function Sermon({ params }: { params: Params }) {
               <h2 className="mt-3 font-display text-3xl font-semibold text-night sm:text-4xl">{sermon.series ?? t.sermons.eyebrow}</h2>
             </Reveal>
             <div className="mt-10 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-              {related.map((s, i) => <SermonCard key={s.id} sermon={s} lang={lang} delay={i * 70} audioLabel={t.sermons.audio} />)}
+              {related.map((s, i) => <SermonCard key={s.id} sermon={s} lang={lang} delay={i * 70} audioLabel={t.sermons.audio} serviceLabel={t.sermons.serviceOf} />)}
             </div>
           </div>
         </section>

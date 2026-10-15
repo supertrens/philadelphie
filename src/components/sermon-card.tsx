@@ -1,15 +1,14 @@
 import { Headphones, PlayCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import type { sermons } from "@/db/schema";
 import type { Locale } from "@/i18n/locales";
-import { shortDate } from "@/lib/format";
+import { longDate, shortDate } from "@/lib/format";
+import type { PublicSermon } from "@/lib/public-data";
 import { Reveal } from "./reveal";
 
-type Sermon = typeof sermons.$inferSelect;
-
 /** Carte d'un message : vignette YouTube (ou motif audio), titre, prédicateur, date. */
-export function SermonCard({ sermon: s, lang, delay = 0, audioLabel }: { sermon: Sermon; lang: Locale; delay?: number; audioLabel: string }) {
+export function SermonCard({ sermon: s, lang, delay = 0, audioLabel, serviceLabel }: { sermon: PublicSermon; lang: Locale; delay?: number; audioLabel: string; serviceLabel: string }) {
+  const title = s.title || `${serviceLabel} ${longDate(s.date, lang)}`;
   return (
     <Reveal delay={delay}>
       <Link href={`/${lang}/messages/${s.id}`} className="group block">
@@ -29,7 +28,7 @@ export function SermonCard({ sermon: s, lang, delay = 0, audioLabel }: { sermon:
           {!s.youtubeId && s.audioPathname && <span className="absolute right-4 bottom-4 rounded-full bg-gold px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-night">{audioLabel}</span>}
         </div>
         <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-muted">{shortDate(s.date, lang)}{s.speaker ? ` · ${s.speaker}` : ""}</p>
-        <h3 className="mt-1 font-display text-2xl leading-tight font-semibold text-night transition group-hover:text-accent">{s.title}</h3>
+        <h3 className="mt-1 font-display text-2xl leading-tight font-semibold text-night transition group-hover:text-accent first-letter:uppercase">{title}</h3>
         {s.scripture && <p className="mt-1 font-display-italic text-lg text-gold">{s.scripture}</p>}
       </Link>
     </Reveal>

@@ -160,7 +160,8 @@
     "more": "Autres messages",
     "moreInSeries": "Dans la même série",
     "noVideo": "Ce message est disponible en audio.",
-    "metaDescription": "Messages et prédications de l’Église Adventiste Philadelphie, Indianapolis — vidéo et audio."
+    "metaDescription": "Messages et prédications de l’Église Adventiste Philadelphie, Indianapolis — vidéo et audio.",
+    "serviceOf": "Culte du"
   },
   "live": {
     "eyebrow": "Culte en direct",
@@ -176,7 +177,8 @@
     "lastMessages": "Derniers messages",
     "metaDescription": "Suivez le culte de l’Église Adventiste Philadelphie en direct, chaque Sabbat à 11h00.",
     "withUsOne": "1 personne avec nous ce matin",
-    "withUs": "{n} personnes avec nous ce matin"
+    "withUs": "{n} personnes avec nous ce matin",
+    "lastService": "Dernier culte"
   },
   "prayer": {
     "eyebrow": "Prière",

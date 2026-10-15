@@ -10,6 +10,7 @@ import { SermonCard } from "@/components/sermon-card";
 import { eglise } from "@/config/eglise";
 import { getDictionary } from "@/i18n/dictionaries";
 import { hasLocale } from "@/i18n/locales";
+import { longDate } from "@/lib/format";
 import { getLiveStatus, getSermons } from "@/lib/public-data";
 
 type Params = Promise<{ lang: string }>;
@@ -33,6 +34,8 @@ export default async function LivePage({ params }: { params: Params }) {
   const slots = eglise.creneaux.map((c) => ({ ...c, nom: x.cultes[c.index].nom, heure: x.cultes[c.index].heure }));
   const liveUrl = status.url ?? eglise.youtube;
   const embed = status.live && status.youtubeId ? `https://www.youtube-nocookie.com/embed/${status.youtubeId}?autoplay=1&rel=0` : null;
+  // Hors direct : le dernier culte de la chaîne, lisible sur place
+  const latest = status.live ? null : sermons.find((s) => s.youtubeId);
 
   return (
     <>
@@ -51,6 +54,16 @@ export default async function LivePage({ params }: { params: Params }) {
             {embed ? (
               <div className="aspect-video">
                 <iframe src={embed} title={t.live.eyebrow} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen className="h-full w-full" />
+              </div>
+            ) : latest ? (
+              <div>
+                <div className="aspect-video">
+                  <iframe src={`https://www.youtube-nocookie.com/embed/${latest.youtubeId}?rel=0`} title={latest.title || `${t.sermons.serviceOf} ${longDate(latest.date, lang)}`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen className="h-full w-full" />
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4 text-white sm:px-8">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold">{t.live.lastService} · <span className="text-white/80 capitalize">{longDate(latest.date, lang)}</span></span>
+                  <a href={liveUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-gold">{t.live.openYoutube} <ArrowUpRight className="h-4 w-4" /></a>
+                </div>
               </div>
             ) : (
               <a href={liveUrl} target="_blank" rel="noreferrer" className="group relative block aspect-video">
@@ -103,7 +116,7 @@ export default async function LivePage({ params }: { params: Params }) {
               <h2 className="mt-3 font-display text-3xl font-semibold text-night sm:text-4xl">{t.live.lastMessages}</h2>
             </Reveal>
             <div className="mt-10 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-              {sermons.slice(0, 3).map((s, i) => <SermonCard key={s.id} sermon={s} lang={lang} delay={i * 70} audioLabel={t.sermons.audio} />)}
+              {sermons.slice(0, 3).map((s, i) => <SermonCard key={s.id} sermon={s} lang={lang} delay={i * 70} audioLabel={t.sermons.audio} serviceLabel={t.sermons.serviceOf} />)}
             </div>
           </div>
         </section>

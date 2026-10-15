@@ -160,7 +160,8 @@
     "more": "More sermons",
     "moreInSeries": "In the same series",
     "noVideo": "This sermon is available as audio.",
-    "metaDescription": "Sermons from Philadelphie Seventh-day Adventist Church, Indianapolis — video and audio."
+    "metaDescription": "Sermons from Philadelphie Seventh-day Adventist Church, Indianapolis — video and audio.",
+    "serviceOf": "Worship service of"
   },
   "live": {
     "eyebrow": "Live worship",
@@ -176,7 +177,8 @@
     "lastMessages": "Latest sermons",
     "metaDescription": "Watch Philadelphie Seventh-day Adventist Church live, every Sabbath at 11:00 AM.",
     "withUsOne": "1 person with us this morning",
-    "withUs": "{n} people with us this morning"
+    "withUs": "{n} people with us this morning",
+    "lastService": "Latest service"
   },
   "prayer": {
     "eyebrow": "Prayer",

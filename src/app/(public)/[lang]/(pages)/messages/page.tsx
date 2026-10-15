@@ -58,7 +58,7 @@ async function List({ lang, t, searchParams }: { lang: Locale; t: Dictionary; se
         <p className="rounded-3xl border border-dashed border-line px-6 py-16 text-center text-muted">{serie ? t.sermons.emptySeries : t.sermons.empty}</p>
       ) : (
         <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((s, i) => <SermonCard key={s.id} sermon={s} lang={lang} delay={(i % 3) * 70} audioLabel={t.sermons.audio} />)}
+          {list.map((s, i) => <SermonCard key={s.id} sermon={s} lang={lang} delay={(i % 3) * 70} audioLabel={t.sermons.audio} serviceLabel={t.sermons.serviceOf} />)}
         </div>
       )}
     </>
